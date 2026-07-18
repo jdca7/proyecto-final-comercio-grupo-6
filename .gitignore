@@ -9,3 +9,12 @@ cypress/downloads/
 Alcance.txt
 Cronograma y Mapa de Actividades*.xlsx
 Proyecto Final Herramientas*.pdf
+
+# Documentacion de diseno/justificacion, UML e informe (se manejan aparte del repo)
+docs/diseno-base-datos.md
+docs/justificacion-2fa.md
+docs/justificacion-fakestoreapi.md
+docs/justificacion-pago.md
+docs/justificacion-stack-frontend.md
+docs/uml/
+Informe-Final-TiendaUIA.docx
