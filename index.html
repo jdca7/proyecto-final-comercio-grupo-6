@@ -92,8 +92,10 @@
       <div id="cart-items"></div>
       <div class="cart-summary">
         <p>Total: <strong id="cart-total">$0.00</strong></p>
-        <button id="cart-checkout-btn" disabled>Proceder al pago</button>
-        <button id="cart-back-btn">Seguir comprando</button>
+        <div class="cart-summary-actions">
+          <button id="cart-back-btn">Seguir comprando</button>
+          <button id="cart-checkout-btn" disabled>Proceder al pago</button>
+        </div>
       </div>
     </section>
 
@@ -172,9 +174,22 @@
 
     <!-- Vista: Administración (solo rol admin) -->
     <section id="view-admin" class="view hidden">
-      <h2>Administración de catálogo</h2>
-      <p class="status" id="admin-status"></p>
-      <div id="admin-content"></div>
+      <div class="admin-tabs">
+        <button type="button" id="admin-tab-catalog" class="admin-tab active">Catálogo</button>
+        <button type="button" id="admin-tab-users" class="admin-tab">Usuarios</button>
+      </div>
+
+      <div id="admin-panel-catalog">
+        <h2>Administración de catálogo</h2>
+        <p class="status" id="admin-status"></p>
+        <div id="admin-content"></div>
+      </div>
+
+      <div id="admin-panel-users" class="hidden">
+        <h2>Administración de usuarios</h2>
+        <p class="status" id="admin-users-status"></p>
+        <div id="admin-users-content"></div>
+      </div>
     </section>
 
   </main>
@@ -186,6 +201,7 @@
   <script type="module" src="js/roles.js"></script>
   <script type="module" src="js/catalog.js"></script>
   <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/admin-users.js"></script>
   <script type="module" src="js/cart.js"></script>
   <script type="module" src="js/checkout.js"></script>
   <script type="module" src="js/paypal-config.js"></script>

@@ -52,19 +52,19 @@ export async function clearCart() {
 function renderCart() {
   itemsEl.innerHTML = "";
   if (items.length === 0) {
-    itemsEl.innerHTML = "<p>El carrito está vacío.</p>";
+    itemsEl.innerHTML = "<p class=\"cart-empty\">El carrito está vacío.</p>";
   }
   for (const it of items) {
     const row = document.createElement("div");
     row.className = "cart-row";
     row.innerHTML = `
-      <span>${it.title}</span>
-      <span>
-        <button class="qty-minus" data-id="${it.id}">-</button>
-        ${it.qty}
-        <button class="qty-plus" data-id="${it.id}">+</button>
+      <span class="cart-item-name">${it.title}</span>
+      <span class="qty-controls">
+        <button class="qty-minus" data-id="${it.id}" aria-label="Disminuir cantidad">−</button>
+        <span class="qty-value">${it.qty}</span>
+        <button class="qty-plus" data-id="${it.id}" aria-label="Aumentar cantidad">+</button>
       </span>
-      <span>$${(it.price * it.qty).toFixed(2)}</span>
+      <span class="cart-item-price">$${(it.price * it.qty).toFixed(2)}</span>
       <button class="remove" data-id="${it.id}">Quitar</button>
     `;
     itemsEl.appendChild(row);

@@ -13,9 +13,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Verdadero si quien hace la petición tiene role:"admin" en su propio
+    // documento de usuario. Se usa para el panel de administración de
+    // usuarios (listar/editar rol/eliminar el documento de otros usuarios).
+    function isAdmin() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
     // users/{uid}: perfil, rol y datos de 2FA del usuario autenticado.
+    // Un admin puede además leer y modificar el documento de cualquier
+    // usuario (panel de administración de usuarios).
     match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if isAdmin();
     }
 
     // carts/{uid}: carrito de compras del usuario autenticado.

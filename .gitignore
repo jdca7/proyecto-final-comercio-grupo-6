@@ -17,6 +17,8 @@ test-results/*
 Alcance.txt
 Cronograma y Mapa de Actividades*.xlsx
 Proyecto Final Herramientas*.pdf
+*.rar
+*.zip
 
 # Documentacion (se maneja aparte del repo; el repo solo tiene codigo)
 docs/

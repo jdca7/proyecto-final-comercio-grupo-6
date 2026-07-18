@@ -23,16 +23,21 @@ export function isAdmin() {
 
 const adminBtn = document.getElementById("nav-admin-btn");
 
-async function loadRole(uid) {
-  const userRef = doc(db, "users", uid);
+async function loadRole(user) {
+  const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
   const data = snap.exists() ? snap.data() : {};
 
   if (!data.role) {
-    await setDoc(userRef, { role: "cliente" }, { merge: true });
+    await setDoc(userRef, { role: "cliente", email: user.email }, { merge: true });
     currentRole = "cliente";
   } else {
     currentRole = data.role;
+    // Mantiene el correo sincronizado para que el panel de administración
+    // de usuarios pueda mostrarlo (Firestore no lo guarda automáticamente).
+    if (data.email !== user.email) {
+      await setDoc(userRef, { email: user.email }, { merge: true });
+    }
   }
 
   adminBtn.classList.toggle("hidden", !isAdmin());
@@ -40,7 +45,7 @@ async function loadRole(uid) {
 }
 
 document.addEventListener("auth:login", (e) => {
-  loadRole(e.detail.user.uid);
+  loadRole(e.detail.user);
 });
 
 document.addEventListener("auth:logout", () => {

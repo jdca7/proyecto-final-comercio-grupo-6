@@ -156,4 +156,30 @@ async function handleDelete(id) {
 document.addEventListener("admin:show", () => {
   editingId = null;
   render();
+  showCatalogTab();
 });
+
+// --- Pestañas del panel de administración (Catálogo / Usuarios) ---
+
+const tabCatalogBtn = document.getElementById("admin-tab-catalog");
+const tabUsersBtn = document.getElementById("admin-tab-users");
+const panelCatalog = document.getElementById("admin-panel-catalog");
+const panelUsers = document.getElementById("admin-panel-users");
+
+function showCatalogTab() {
+  tabCatalogBtn.classList.add("active");
+  tabUsersBtn.classList.remove("active");
+  panelCatalog.classList.remove("hidden");
+  panelUsers.classList.add("hidden");
+}
+
+function showUsersTab() {
+  tabCatalogBtn.classList.remove("active");
+  tabUsersBtn.classList.add("active");
+  panelCatalog.classList.add("hidden");
+  panelUsers.classList.remove("hidden");
+  document.dispatchEvent(new CustomEvent("admin-users:show"));
+}
+
+tabCatalogBtn.addEventListener("click", showCatalogTab);
+tabUsersBtn.addEventListener("click", showUsersTab);

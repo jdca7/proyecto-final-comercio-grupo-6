@@ -12,6 +12,8 @@ y PayPal Sandbox. Implementa el alcance original completo del enunciado.
   Authenticator/Authy), implementada con la Web Crypto API — sin costo, sin
   necesitar el plan de pago de Firebase
 - **Roles de usuario** (cliente/admin) con vista de administración separada
+- **Administración de usuarios** (solo rol admin): listar todos los usuarios
+  registrados, cambiarles el rol, y eliminar su documento de datos (rol/2FA)
 - Catálogo de productos desde FakeStoreAPI, con buscador
 - **Mantenimiento de catálogo (CRUD)**: crear, editar y eliminar productos
   (solo rol admin)
@@ -73,11 +75,28 @@ compartido):
 
 ## 3. Convertir un usuario en administrador
 
-No hay una pantalla para esto (es intencional, para no complicar el alcance).
-Un integrante del equipo debe ir a la consola de Firebase → Firestore
-Database → colección `users` → abrir el documento del usuario → cambiar el
-campo `role` de `"cliente"` a `"admin"`. Al recargar la página, ese usuario
-verá el botón "Administración" en la barra superior.
+El **primer** administrador debe promoverse manualmente, ya que hasta ese
+momento nadie tiene permiso dentro de la app para hacerlo: ir a la consola de
+Firebase → Firestore Database → colección `users` → abrir el documento del
+usuario → cambiar el campo `role` de `"cliente"` a `"admin"`. Al recargar la
+página, ese usuario verá el botón "Administración" en la barra superior.
+
+A partir de ahí, ese primer administrador puede promover (o degradar) a
+cualquier otro usuario directamente desde la app: Administración → pestaña
+"Usuarios" → cambiar el rol desde la lista, sin volver a tocar Firestore a
+mano. Desde esa misma pantalla también se puede eliminar el documento de
+datos de un usuario (rol y configuración de 2FA) — **esto no elimina su
+cuenta de acceso** (correo/contraseña) de Firebase Authentication, ya que
+eso requeriría un backend con permisos administrativos que este proyecto no
+usa; si esa persona vuelve a iniciar sesión, la app la tratará como una
+cuenta nueva.
+
+**Importante si aplican `firestore.rules` en producción:** la vista de
+usuarios necesita que un admin pueda leer/escribir el documento de
+*cualquier* usuario, no solo el propio. Asegúrense de copiar la versión
+actual de `firestore.rules` (con la función `isAdmin()`) a Firebase Console
+→ Firestore Database → Reglas — la versión anterior del archivo no incluía
+este permiso y bloquearía el panel de usuarios.
 
 ## 4. Correr el proyecto localmente
 
