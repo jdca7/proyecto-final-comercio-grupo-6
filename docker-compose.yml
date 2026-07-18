@@ -8,6 +8,8 @@ services:
       - "8000:80"
 
   # docker compose run --rm test-unit
+  # Resultados: se imprimen en la terminal Y quedan guardados en
+  # ./test-results/jest-results.json
   test-unit:
     build:
       context: .
@@ -15,9 +17,13 @@ services:
       args:
         NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
         NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-    command: npm test
+    volumes:
+      - ./test-results:/app/test-results
+    command: npx jest --json --outputFile=test-results/jest-results.json
 
   # docker compose run --rm test-integration
+  # Resultados: se imprimen en la terminal Y quedan guardados en
+  # ./test-results/newman-results.json
   test-integration:
     build:
       context: .
@@ -25,10 +31,14 @@ services:
       args:
         NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
         NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
-    command: npm run test:integration
+    volumes:
+      - ./test-results:/app/test-results
+    command: npx newman run tests/postman/FakeStoreAPI.postman_collection.json --reporters cli,json --reporter-json-export test-results/newman-results.json
 
   # docker compose run --rm test-e2e
   # Requiere que el servicio "app" este corriendo (docker compose up -d app)
+  # Resultados: se imprimen en la terminal; si algun caso falla, la captura
+  # de pantalla y el video quedan en ./cypress/screenshots y ./cypress/videos
   test-e2e:
     build:
       context: .
@@ -45,6 +55,9 @@ services:
     # de Compose, el navegador lo trata como origen inseguro y crypto.subtle
     # queda undefined.
     network_mode: "service:app"
+    volumes:
+      - ./cypress/screenshots:/app/cypress/screenshots
+      - ./cypress/videos:/app/cypress/videos
     environment:
       - CYPRESS_baseUrl=http://localhost
       - CYPRESS_ADMIN_EMAIL=${CYPRESS_ADMIN_EMAIL:-}

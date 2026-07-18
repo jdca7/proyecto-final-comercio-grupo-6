@@ -161,6 +161,18 @@ docker compose up -d app                   # necesario antes de correr las E2E
 docker compose run --rm test-e2e           # pruebas funcionales E2E (Cypress)
 ```
 
+**¿Dónde quedan los resultados?** Además de imprimirse en la terminal, quedan
+guardados en tu carpeta del proyecto (sobreviven aunque el contenedor se
+borre con `--rm`):
+
+- `test-results/jest-results.json` — resultado de las pruebas unitarias
+- `test-results/newman-results.json` — resultado de las pruebas de integración
+- `cypress/screenshots/` — capturas de pantalla automáticas de cualquier caso
+  de Cypress que falle (si todo pasa, queda vacío)
+
+Estas carpetas están en `.gitignore`: se generan localmente, no se suben al
+repositorio.
+
 Para la suite `admin-crud` (ver más abajo), crear un archivo `.env` en la raíz
 del proyecto (ya está en `.gitignore`) con:
 

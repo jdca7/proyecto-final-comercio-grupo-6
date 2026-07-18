@@ -1,11 +1,17 @@
 node_modules/
-cypress/screenshots/
-cypress/videos/
+cypress/screenshots/*
+!cypress/screenshots/.gitkeep
+cypress/videos/*
+!cypress/videos/.gitkeep
 cypress/downloads/
 cypress.env.json
 .env
 *.log
 .claude/
+
+# Resultados de las pruebas (se generan al correrlas, no se versionan)
+test-results/*
+!test-results/.gitkeep
 
 # Materiales administrativos del curso (no forman parte del proyecto/sistema)
 Alcance.txt
