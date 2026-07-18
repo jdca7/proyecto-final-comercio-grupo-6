@@ -56,7 +56,11 @@ async function render() {
           .map(
             (u) => `
           <tr data-uid="${u.uid}">
-            <td>${escapeHtml(u.email || "(sin correo registrado)")}${u.uid === myUid ? " <em>(tú)</em>" : ""}</td>
+            <td>${
+              u.email
+                ? escapeHtml(u.email)
+                : `<span class="uid-fallback" title="${escapeHtml(u.uid)}">UID: ${escapeHtml(u.uid.slice(0, 10))}…</span>`
+            }${u.uid === myUid ? " <em>(tú)</em>" : ""}</td>
             <td>
               <select class="role-select" data-uid="${u.uid}" ${u.uid === myUid ? "disabled" : ""}>
                 <option value="cliente" ${u.role === "cliente" ? "selected" : ""}>cliente</option>
