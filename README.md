@@ -31,8 +31,26 @@ y PayPal Sandbox. Implementa el alcance original completo del enunciado.
 - Una app de autenticación en el teléfono (Google Authenticator, Authy, etc.)
   para probar el 2FA
 
-## 1. Configurar Firebase
+## 1. Clonar el repositorio
 
+```bash
+git clone https://github.com/jdca7/proyecto-final-comercio-grupo-6.git
+cd proyecto-final-comercio-grupo-6
+```
+
+## 2. Firebase y PayPal — ya están configurados
+
+`js/firebase-config.js` y `js/paypal-config.js` **ya traen credenciales reales
+y funcionando** del proyecto compartido del equipo (proyecto de Firebase
+`proyecto-uia` y una app de PayPal Sandbox). No hace falta crear nada para
+correr el proyecto tal cual está — pasa directo al paso 4 ("Correr el
+proyecto localmente").
+
+Solo sigue estos pasos si alguien del equipo necesita **su propio** proyecto
+separado (por ejemplo, para probar algo sin afectar los datos del proyecto
+compartido):
+
+**Firebase:**
 1. Entrar a https://console.firebase.google.com y crear un proyecto nuevo
    (gratis, plan Spark).
 2. En el menú lateral: **Authentication** → pestaña "Sign-in method" →
@@ -42,16 +60,13 @@ y PayPal Sandbox. Implementa el alcance original completo del enunciado.
 4. En **Configuración del proyecto** (ícono de engranaje) → pestaña
    "General" → sección "Tus apps" → agregar una app **Web** (ícono `</>`).
 5. Copiar el objeto `firebaseConfig` que Firebase genera y pegarlo en
-   [`js/firebase-config.js`](js/firebase-config.js), reemplazando los valores
-   `"TODO"`.
+   [`js/firebase-config.js`](js/firebase-config.js).
 
-## 2. Configurar PayPal Sandbox
-
+**PayPal Sandbox:**
 1. Crear una cuenta gratuita en https://developer.paypal.com
 2. En el Dashboard: "Apps & Credentials", modo **Sandbox** → copiar el
    **Client ID** de la app por defecto.
-3. Pegarlo en [`js/paypal-config.js`](js/paypal-config.js), reemplazando
-   `"TODO"`.
+3. Pegarlo en [`js/paypal-config.js`](js/paypal-config.js).
 4. (Opcional) En "Sandbox > Accounts" hay una cuenta de comprador de prueba
    con correo/contraseña ficticios para completar el pago de extremo a
    extremo sin usar dinero real.
@@ -105,8 +120,8 @@ Luego abrir http://localhost:8000 en el navegador.
 ```
 index.html
 css/styles.css
-js/firebase-config.js     # Credenciales de Firebase (completar)
-js/paypal-config.js       # Client ID de PayPal sandbox (completar)
+js/firebase-config.js     # Credenciales de Firebase (ya configurado)
+js/paypal-config.js       # Client ID de PayPal sandbox (ya configurado)
 js/auth.js                # Registro, login, logout
 js/twofa.js                # Verificación en dos pasos (TOTP)
 js/roles.js                # Rol de usuario (cliente/admin)
@@ -167,7 +182,14 @@ cálculo real del código TOTP, login, carrito, checkout (aprobado/rechazado),
 bitácora y CRUD de catálogo — todo contra el Firebase y FakeStoreAPI reales
 del proyecto, no mocks.
 
-## Próximos pasos (ver plan del proyecto)
+## Documentación adicional
 
-- Diagramas UML (casos de uso, clases, secuencia)
-- Informe final y presentación
+Este repositorio contiene únicamente el código fuente, la configuración y las
+pruebas automatizadas. La documentación del proyecto (justificación de
+herramientas, diseño de base de datos, diagramas UML, matriz de requisitos,
+casos de prueba documentados, e informe final en Word) se maneja aparte y
+fue compartida directamente con el equipo.
+
+Pendiente para la entrega final del curso (fuera del alcance de este
+repositorio): portada del informe, presentación en PowerPoint con la
+plantilla del docente, y las bitácoras de trabajo firmadas por el equipo.
