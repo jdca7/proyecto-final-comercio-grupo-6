@@ -214,6 +214,27 @@ cálculo real del código TOTP, login, carrito, checkout (aprobado/rechazado),
 bitácora y CRUD de catálogo — todo contra el Firebase y FakeStoreAPI reales
 del proyecto, no mocks.
 
+### Solución de problemas: "self-signed certificate in certificate chain"
+
+Si al construir la imagen de pruebas (`docker compose run --rm test-unit` o
+cualquiera de las otras) ves un error como `SELF_SIGNED_CERT_IN_CHAIN` al
+correr `npm ci`, significa que tu red (institucional, corporativa, o cierto
+antivirus) está inspeccionando el tráfico HTTPS con su propio certificado, y
+Docker no confía en él por defecto — no es un problema del proyecto.
+
+Solución: crear un archivo `.env` en la raíz del proyecto (ya está en
+`.gitignore`, nunca se sube) con:
+
+```
+NPM_CONFIG_STRICT_SSL=false
+NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
+Esto relaja la verificación de certificados **solo dentro del contenedor de
+pruebas**, nunca en la app en sí ni en el repositorio. Si no tienes este
+problema, no hace falta crear este archivo — por defecto todo se valida
+normalmente.
+
 ## Documentación adicional
 
 Este repositorio contiene únicamente el código fuente, la configuración y las
