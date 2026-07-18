@@ -1,0 +1,158 @@
+{
+  "info": {
+    "name": "TiendaUIA - FakeStoreAPI (pruebas de integración)",
+    "description": "Pruebas de integración contra FakeStoreAPI: catálogo (solo lectura para clientes) y mantenimiento de catálogo (CRUD, solo admin). Corresponde a los casos CP-I01 a CP-I05 del documento de casos de prueba.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://fakestoreapi.com" }
+  ],
+  "item": [
+    {
+      "name": "CP-I01 - GET /products (listar catálogo)",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/products"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status code es 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('la respuesta es un arreglo con productos', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(Array.isArray(body)).to.be.true;",
+              "  pm.expect(body.length).to.be.above(0);",
+              "});",
+              "",
+              "pm.test('cada producto tiene los campos esperados', function () {",
+              "  const body = pm.response.json();",
+              "  const first = body[0];",
+              "  pm.expect(first).to.have.property('id');",
+              "  pm.expect(first).to.have.property('title');",
+              "  pm.expect(first).to.have.property('price');",
+              "  pm.expect(first).to.have.property('category');",
+              "  pm.expect(first).to.have.property('image');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "CP-I02 - GET /products/1 (detalle de producto)",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/products/1"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status code es 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('el id del producto coincide con lo solicitado', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.id).to.eql(1);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "CP-I03 - POST /products (crear producto, solo admin)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/products",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Producto de prueba Postman\",\n  \"price\": 29.99,\n  \"description\": \"Creado desde la colección de pruebas de integración\",\n  \"image\": \"https://i.pravatar.cc/150\",\n  \"category\": \"pruebas\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status code es 201 (creado)', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('la respuesta incluye un id generado', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('id');",
+              "});",
+              "",
+              "pm.test('el título coincide con lo enviado', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.title).to.eql('Producto de prueba Postman');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "CP-I04 - PUT /products/7 (editar producto, solo admin)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "url": "{{base_url}}/products/7",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Producto editado desde Postman\",\n  \"price\": 15.5,\n  \"description\": \"Editado en prueba de integración\",\n  \"image\": \"https://i.pravatar.cc/150\",\n  \"category\": \"pruebas\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status code es 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('el título editado se refleja en la respuesta', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.title).to.eql('Producto editado desde Postman');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "CP-I05 - DELETE /products/7 (eliminar producto, solo admin)",
+      "request": {
+        "method": "DELETE",
+        "url": "{{base_url}}/products/7"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('status code es 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('la respuesta confirma el id eliminado', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body).to.have.property('id');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

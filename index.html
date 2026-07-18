@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TiendaUIA — Portal de Comercio Electrónico</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>TiendaUIA</h1>
+    <nav id="nav-user" class="hidden">
+      <span id="nav-email"></span>
+      <button id="nav-cart-btn">Carrito (<span id="nav-cart-count">0</span>)</button>
+      <button id="nav-bitacora-btn">Bitácora</button>
+      <button id="nav-admin-btn" class="hidden">Administración</button>
+      <button id="nav-logout-btn">Cerrar sesión</button>
+    </nav>
+  </header>
+
+  <main id="app">
+
+    <!-- Vista: Autenticación -->
+    <section id="view-auth" class="view">
+      <div class="auth-box">
+        <h2 id="auth-title">Iniciar sesión</h2>
+        <p id="auth-error" class="error hidden"></p>
+        <form id="auth-form">
+          <label>Correo
+            <input type="email" id="auth-email" required />
+          </label>
+          <label>Contraseña
+            <input type="password" id="auth-password" required minlength="6" />
+          </label>
+          <button type="submit" id="auth-submit-btn">Iniciar sesión</button>
+        </form>
+        <p>
+          <span id="auth-toggle-text">¿No tienes cuenta?</span>
+          <a href="#" id="auth-toggle-link">Regístrate</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- Vista: Configuración de 2FA (primer registro) -->
+    <section id="view-2fa-setup" class="view hidden">
+      <div class="auth-box">
+        <h2>Configurar verificación en dos pasos</h2>
+        <p>
+          Instala una app de autenticación como <strong>Google Authenticator</strong> o
+          <strong>Authy</strong> e ingresa manualmente esta clave:
+        </p>
+        <p class="totp-secret" id="twofa-setup-secret"></p>
+        <p class="status">Luego escribe el código de 6 dígitos que te muestre la app para confirmar.</p>
+        <p id="twofa-setup-error" class="error hidden"></p>
+        <form id="twofa-setup-form">
+          <label>Código de verificación
+            <input type="text" id="twofa-setup-code" inputmode="numeric" maxlength="6" required />
+          </label>
+          <button type="submit">Confirmar y activar 2FA</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Vista: Verificación de 2FA (logins posteriores) -->
+    <section id="view-2fa-verify" class="view hidden">
+      <div class="auth-box">
+        <h2>Verificación en dos pasos</h2>
+        <p>Ingresa el código de 6 dígitos de tu app de autenticación.</p>
+        <p id="twofa-verify-error" class="error hidden"></p>
+        <form id="twofa-verify-form">
+          <label>Código de verificación
+            <input type="text" id="twofa-verify-code" inputmode="numeric" maxlength="6" required />
+          </label>
+          <button type="submit">Verificar</button>
+        </form>
+        <p><a href="#" id="twofa-verify-logout-link">No tengo acceso, cerrar sesión</a></p>
+      </div>
+    </section>
+
+    <!-- Vista: Catálogo -->
+    <section id="view-catalog" class="view hidden">
+      <div class="catalog-toolbar">
+        <input type="search" id="catalog-search" placeholder="Buscar productos..." />
+      </div>
+      <div id="catalog-status" class="status"></div>
+      <div id="catalog-grid" class="grid"></div>
+    </section>
+
+    <!-- Vista: Carrito -->
+    <section id="view-cart" class="view hidden">
+      <h2>Carrito de compras</h2>
+      <div id="cart-items"></div>
+      <div class="cart-summary">
+        <p>Total: <strong id="cart-total">$0.00</strong></p>
+        <button id="cart-checkout-btn" disabled>Proceder al pago</button>
+        <button id="cart-back-btn">Seguir comprando</button>
+      </div>
+    </section>
+
+    <!-- Vista: Checkout -->
+    <section id="view-checkout" class="view hidden">
+      <h2>Resumen del pedido</h2>
+      <div id="checkout-summary"></div>
+
+      <fieldset class="payment-method-select">
+        <legend>Selecciona método de pago</legend>
+        <label class="radio-label">
+          <input type="radio" name="payment-method" value="card" id="method-card" checked />
+          Tarjeta (simulada)
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="payment-method" value="paypal" id="method-paypal" />
+          PayPal (sandbox real)
+        </label>
+      </fieldset>
+
+      <form id="checkout-form">
+        <h3>Método de pago (simulado)</h3>
+        <p class="status">
+          Tarjetas de prueba: <strong>4242 4242 4242 4242</strong> (aprobada) ·
+          <strong>4000 0000 0000 0002</strong> (rechazada: fondos insuficientes)
+        </p>
+        <label>Nombre en la tarjeta
+          <input type="text" id="checkout-name" required />
+        </label>
+        <label>Número de tarjeta
+          <input type="text" id="checkout-card" placeholder="4242 4242 4242 4242" required maxlength="19" />
+        </label>
+        <div class="row">
+          <label>Vencimiento
+            <input type="text" id="checkout-expiry" placeholder="MM/AA" required maxlength="5" />
+          </label>
+          <label>CVV
+            <input type="text" id="checkout-cvv" placeholder="123" required maxlength="4" />
+          </label>
+        </div>
+        <p id="checkout-error" class="error hidden"></p>
+        <button type="submit" id="checkout-submit-btn">Confirmar compra</button>
+        <button type="button" id="checkout-cancel-btn">Cancelar</button>
+      </form>
+
+      <div id="paypal-section" class="hidden">
+        <h3>Pagar con PayPal (sandbox)</h3>
+        <p class="status">
+          Este es un pago real de prueba en el entorno sandbox de PayPal (dinero ficticio, no se cobra nada real).
+        </p>
+        <div id="paypal-button-container"></div>
+        <p id="paypal-error" class="error hidden"></p>
+        <button type="button" id="paypal-cancel-btn">Cancelar</button>
+      </div>
+    </section>
+
+    <!-- Vista: Confirmación -->
+    <section id="view-confirmation" class="view hidden">
+      <div class="confirmation-box">
+        <h2 id="confirmation-title">¡Compra confirmada!</h2>
+        <p id="confirmation-details"></p>
+        <button id="confirmation-continue-btn">Volver al catálogo</button>
+      </div>
+    </section>
+
+    <!-- Vista: Bitácora -->
+    <section id="view-bitacora" class="view hidden">
+      <h2>Bitácora de transacciones</h2>
+      <table id="bitacora-table">
+        <thead>
+          <tr><th>Fecha</th><th>Evento</th><th>Detalle</th></tr>
+        </thead>
+        <tbody id="bitacora-body"></tbody>
+      </table>
+    </section>
+
+    <!-- Vista: Administración (solo rol admin) -->
+    <section id="view-admin" class="view hidden">
+      <h2>Administración de catálogo</h2>
+      <p class="status" id="admin-status"></p>
+      <div id="admin-content"></div>
+    </section>
+
+  </main>
+
+  <!-- Firebase SDK (modular v9, vía CDN) -->
+  <script type="module" src="js/firebase-config.js"></script>
+  <script type="module" src="js/auth.js"></script>
+  <script type="module" src="js/twofa.js"></script>
+  <script type="module" src="js/roles.js"></script>
+  <script type="module" src="js/catalog.js"></script>
+  <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/cart.js"></script>
+  <script type="module" src="js/checkout.js"></script>
+  <script type="module" src="js/paypal-config.js"></script>
+  <script type="module" src="js/paypal-checkout.js"></script>
+  <script type="module" src="js/bitacora.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

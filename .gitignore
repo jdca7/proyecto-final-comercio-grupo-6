@@ -1,0 +1,11 @@
+node_modules/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
+*.log
+.claude/
+
+# Materiales administrativos del curso (no forman parte del proyecto/sistema)
+Alcance.txt
+Cronograma y Mapa de Actividades*.xlsx
+Proyecto Final Herramientas*.pdf

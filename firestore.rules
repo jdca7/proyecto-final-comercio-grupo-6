@@ -1,0 +1,40 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore para TiendaUIA.
+// Reemplazan el "modo de prueba" (acceso abierto) usado durante el
+// desarrollo inicial. Aplicar en Firebase Console > Firestore Database >
+// Reglas, o mediante Firebase CLI (`firebase deploy --only firestore:rules`).
+//
+// Principio: cada usuario solo puede leer/escribir SU PROPIO documento de
+// usuario, SU PROPIO carrito, y crear/leer SUS PROPIOS eventos de bitácora
+// (nunca los de otro uid). La bitácora es de solo agregar: no se permite
+// editar ni borrar eventos ya registrados, para que siga siendo una
+// bitácora confiable (append-only).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // users/{uid}: perfil, rol y datos de 2FA del usuario autenticado.
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // carts/{uid}: carrito de compras del usuario autenticado.
+    match /carts/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // bitacora/{eventId}: eventos de login y compra. Solo lectura y
+    // creación de eventos propios; no se permite modificar ni eliminar
+    // eventos existentes (bitácora de solo agregar).
+    match /bitacora/{eventId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // Cualquier otra ruta queda denegada por defecto.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
