@@ -81,7 +81,17 @@ verá el botón "Administración" en la barra superior.
 
 ## 4. Correr el proyecto localmente
 
-Con Python instalado, desde la carpeta del proyecto:
+**Opción A — con Docker (recomendada: mismo entorno para todo el equipo,
+sin depender de qué tenga instalado cada quien):**
+
+```bash
+docker compose up -d app
+```
+
+Luego abrir http://localhost:8000 en el navegador. Para detenerlo:
+`docker compose down`.
+
+**Opción B — con Python, sin Docker:**
 
 ```bash
 python -m http.server 8000
@@ -140,8 +150,30 @@ cypress/e2e/                # Pruebas funcionales E2E (Cypress)
 
 ## 6. Correr las pruebas automatizadas
 
-Este `package.json` es solo para las herramientas de prueba (Node/npm) — la
-app en sí no lo necesita, corre como sitio 100% estático.
+**Opción A — con Docker (recomendada):** cada comando corre en un contenedor
+con Node, navegador y todas las dependencias ya listas — nadie del equipo
+necesita instalar Node, Cypress ni nada más.
+
+```bash
+docker compose run --rm test-unit          # pruebas unitarias (Jest)
+docker compose run --rm test-integration   # pruebas de integración (Postman/Newman)
+docker compose up -d app                   # necesario antes de correr las E2E
+docker compose run --rm test-e2e           # pruebas funcionales E2E (Cypress)
+```
+
+Para la suite `admin-crud` (ver más abajo), crear un archivo `.env` en la raíz
+del proyecto (ya está en `.gitignore`) con:
+
+```
+CYPRESS_ADMIN_EMAIL=correo-de-la-cuenta-admin@ejemplo.com
+CYPRESS_ADMIN_PASSWORD=la-contraseña-de-esa-cuenta
+CYPRESS_ADMIN_TOTP_SECRET=la-clave-secreta-totp-de-esa-cuenta
+```
+
+Docker Compose lo carga automáticamente. Si no existe, esa suite específica
+se omite sola (las otras dos corren igual).
+
+**Opción B — con Node/npm instalado localmente, sin Docker:**
 
 ```bash
 npm install          # una sola vez, instala Jest, Newman y Cypress
@@ -149,9 +181,9 @@ npm test             # pruebas unitarias (Jest) — 30 casos, no requieren red
 npm run test:integration   # pruebas de integración (Postman/Newman) contra FakeStoreAPI real
 ```
 
-Para las pruebas funcionales E2E (Cypress), primero debe estar corriendo el
-servidor estático en `http://localhost:8000` (ver sección 4) con Firebase y
-PayPal ya configurados.
+Para las pruebas funcionales E2E (Cypress) sin Docker, primero debe estar
+corriendo el servidor estático en `http://localhost:8000` (ver sección 4)
+con Firebase y PayPal ya configurados.
 
 La suite `cypress/e2e/admin-crud.cy.js` necesita una cuenta ya promovida a
 `role: "admin"` en Firestore (ver sección 3), con 2FA configurado. Sus

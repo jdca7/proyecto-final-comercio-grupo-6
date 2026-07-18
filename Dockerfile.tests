@@ -1,0 +1,25 @@
+# Imagen para correr las pruebas automatizadas (Jest, Newman, Cypress) de
+# forma identica sin importar la maquina de cada integrante del equipo.
+# cypress/browsers ya trae Node + Chrome + todas las librerias de sistema
+# que Cypress necesita para correr un navegador real.
+FROM cypress/browsers:latest
+
+WORKDIR /app
+
+# Por defecto se valida TLS normalmente (seguro). Solo se relaja si se pasan
+# explicitamente estos build-args en false/0 (util unicamente detras de un
+# proxy con certificado propio, como en algunos entornos corporativos o de
+# CI). NPM_CONFIG_STRICT_SSL cubre las descargas del registro de npm;
+# NODE_TLS_REJECT_UNAUTHORIZED cubre la descarga del binario de Cypress,
+# que se hace por fuera del cliente de npm.
+ARG NPM_CONFIG_STRICT_SSL=true
+ARG NODE_TLS_REJECT_UNAUTHORIZED=1
+ENV NPM_CONFIG_STRICT_SSL=$NPM_CONFIG_STRICT_SSL
+ENV NODE_TLS_REJECT_UNAUTHORIZED=$NODE_TLS_REJECT_UNAUTHORIZED
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+CMD ["npx", "cypress", "run"]

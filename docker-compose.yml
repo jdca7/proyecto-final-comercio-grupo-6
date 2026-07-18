@@ -1,0 +1,53 @@
+services:
+  # Sirve la app estatica en http://localhost:8000
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+
+  # docker compose run --rm test-unit
+  test-unit:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+      args:
+        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+    command: npm test
+
+  # docker compose run --rm test-integration
+  test-integration:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+      args:
+        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+    command: npm run test:integration
+
+  # docker compose run --rm test-e2e
+  # Requiere que el servicio "app" este corriendo (docker compose up -d app)
+  test-e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+      args:
+        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+    depends_on:
+      - app
+    # Comparte la red del contenedor "app" para que Cypress vea la app como
+    # "localhost". Esto es necesario porque el 2FA usa la Web Crypto API
+    # (crypto.subtle), que los navegadores solo exponen en un "contexto
+    # seguro" (https o localhost) — con el hostname "app" del DNS interno
+    # de Compose, el navegador lo trata como origen inseguro y crypto.subtle
+    # queda undefined.
+    network_mode: "service:app"
+    environment:
+      - CYPRESS_baseUrl=http://localhost
+      - CYPRESS_ADMIN_EMAIL=${CYPRESS_ADMIN_EMAIL:-}
+      - CYPRESS_ADMIN_PASSWORD=${CYPRESS_ADMIN_PASSWORD:-}
+      - CYPRESS_ADMIN_TOTP_SECRET=${CYPRESS_ADMIN_TOTP_SECRET:-}
+    command: npx cypress run

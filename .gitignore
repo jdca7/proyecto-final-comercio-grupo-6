@@ -3,6 +3,7 @@ cypress/screenshots/
 cypress/videos/
 cypress/downloads/
 cypress.env.json
+.env
 *.log
 .claude/
 
