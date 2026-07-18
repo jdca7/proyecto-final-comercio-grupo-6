@@ -90,6 +90,7 @@ document.getElementById("nav-logout-btn").addEventListener("click", async () => 
 });
 
 onAuthStateChanged(auth, (user) => {
+  document.getElementById("loading-screen").classList.add("hidden");
   if (user) {
     setNavVisible(true);
     setNavEmail(user.email);

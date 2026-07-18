@@ -32,6 +32,15 @@ body {
   display: none !important;
 }
 
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  color: var(--color-primary-dark);
+  font-weight: 600;
+}
+
 .topbar {
   display: flex;
   justify-content: space-between;
