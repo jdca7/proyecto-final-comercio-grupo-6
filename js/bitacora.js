@@ -14,12 +14,19 @@ const bodyEl = document.getElementById("bitacora-body");
 
 async function logEvent(uid, evento, detalle) {
   if (!uid) return;
-  await addDoc(collection(db, "bitacora"), {
-    uid,
-    evento,
-    detalle,
-    fecha: serverTimestamp(),
-  });
+  try {
+    await addDoc(collection(db, "bitacora"), {
+      uid,
+      evento,
+      detalle,
+      fecha: serverTimestamp(),
+    });
+  } catch (err) {
+    // No dejamos que un fallo al registrar la bitácora (ej. un reintento
+    // duplicado de red) tumbe el resto de la app: es un registro de mejor
+    // esfuerzo, no una operación crítica para el usuario.
+    console.warn("No se pudo registrar el evento en la bitácora:", err.message);
+  }
 }
 
 async function renderBitacora(uid) {
