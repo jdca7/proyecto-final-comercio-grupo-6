@@ -136,8 +136,25 @@ npm run test:integration   # pruebas de integración (Postman/Newman) contra Fak
 
 Para las pruebas funcionales E2E (Cypress), primero debe estar corriendo el
 servidor estático en `http://localhost:8000` (ver sección 4) con Firebase y
-PayPal ya configurados, y con la cuenta admin de `cypress/e2e/admin-crud.cy.js`
-promovida a `role: "admin"` en Firestore (ver sección 3):
+PayPal ya configurados.
+
+La suite `cypress/e2e/admin-crud.cy.js` necesita una cuenta ya promovida a
+`role: "admin"` en Firestore (ver sección 3), con 2FA configurado. Sus
+credenciales **no están en el código** — hay que pasarlas por variables de
+entorno de Cypress, creando un archivo `cypress.env.json` en la raíz del
+proyecto (ya está en `.gitignore`, nunca se sube al repositorio):
+
+```json
+{
+  "ADMIN_EMAIL": "correo-de-la-cuenta-admin@ejemplo.com",
+  "ADMIN_PASSWORD": "la-contraseña-de-esa-cuenta",
+  "ADMIN_TOTP_SECRET": "la-clave-secreta-totp-de-esa-cuenta"
+}
+```
+
+Si no se define este archivo, esa suite específica se omite automáticamente
+(las otras dos corren igual, ya que crean su propia cuenta de prueba en cada
+ejecución).
 
 ```bash
 npx cypress open     # modo interactivo (recomendado para ver el navegador)

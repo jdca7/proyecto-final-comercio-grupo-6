@@ -1,14 +1,22 @@
 // CP-F06 y CP-F07: rol admin y mantenimiento de catálogo (CRUD).
-// Usa una cuenta de prueba que YA fue promovida a "admin" en Firestore
-// (ver README: "Convertir un usuario en administrador"). Si el equipo borra
-// esta cuenta o cambia su rol, hay que actualizar las credenciales abajo o
-// pasarlas por variables de entorno de Cypress (CYPRESS_ADMIN_EMAIL,
-// CYPRESS_ADMIN_PASSWORD, CYPRESS_ADMIN_TOTP_SECRET).
+// Requiere una cuenta de prueba YA promovida a "admin" en Firestore (ver
+// README: "Convertir un usuario en administrador"), con sus credenciales
+// pasadas por variables de entorno de Cypress — nunca hardcodeadas aquí:
+//   CYPRESS_ADMIN_EMAIL, CYPRESS_ADMIN_PASSWORD, CYPRESS_ADMIN_TOTP_SECRET
+// Definirlas en cypress.env.json (no versionado) o como variables de entorno
+// del sistema antes de correr `npx cypress run`.
 
 describe("Rol admin y CRUD de catálogo", () => {
-  const email = Cypress.env("ADMIN_EMAIL") || "estudiante.grupo6@test.com";
-  const password = Cypress.env("ADMIN_PASSWORD") || "password123";
-  const secret = Cypress.env("ADMIN_TOTP_SECRET") || "REDACTED_TOTP_SECRET";
+  const email = Cypress.env("ADMIN_EMAIL");
+  const password = Cypress.env("ADMIN_PASSWORD");
+  const secret = Cypress.env("ADMIN_TOTP_SECRET");
+
+  before(function () {
+    if (!email || !password || !secret) {
+      cy.log("Faltan variables de entorno ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_TOTP_SECRET — se omite esta suite.");
+      this.skip();
+    }
+  });
 
   beforeEach(() => {
     cy.visit("/");
