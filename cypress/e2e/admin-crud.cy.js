@@ -25,9 +25,25 @@ describe("Rol admin y CRUD de catálogo", () => {
     });
   });
 
+  // Cierra sesión primero si Firebase restauró una sesión persistida de una
+  // prueba anterior (Cypress limpia localStorage/sessionStorage entre tests,
+  // pero no el IndexedDB donde Firebase Auth guarda la sesión). Firebase
+  // resuelve el estado de sesión de forma asíncrona tras cargar la página, así
+  // que esperamos un momento antes de decidir si hay que cerrar sesión.
+  function logoutIfNeeded() {
+    cy.wait(1500);
+    cy.get("#nav-user").then(($nav) => {
+      if (!$nav.hasClass("hidden")) {
+        cy.get("#nav-logout-btn").click();
+        cy.get("#view-auth", { timeout: 10000 }).should("not.have.class", "hidden");
+      }
+    });
+  }
+
   beforeEach(function () {
     const { email, password, secret } = this;
     cy.visit("/");
+    logoutIfNeeded();
     cy.get("#auth-email").type(email);
     cy.get("#auth-password").type(password);
     cy.get("#auth-submit-btn").click();
