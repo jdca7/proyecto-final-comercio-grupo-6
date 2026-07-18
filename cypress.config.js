@@ -3,6 +3,12 @@ const path = require("path");
 const { pathToFileURL } = require("url");
 
 module.exports = defineConfig({
+  // Cypress.env() se usa en los specs para leer credenciales del admin
+  // (ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_TOTP_SECRET). Por defecto Cypress
+  // tambien expone Cypress.env() al codigo de la app bajo prueba (el
+  // iframe), lo cual no necesitamos y es innecesariamente riesgoso para
+  // datos sensibles. Esto no afecta el uso de Cypress.env() en los specs.
+  allowCypressEnv: false,
   e2e: {
     baseUrl: "http://localhost:8000",
     supportFile: false,
