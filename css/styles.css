@@ -46,6 +46,22 @@ body {
   font-size: 1.4rem;
 }
 
+.brand-home-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.brand-home-btn:hover {
+  background: transparent;
+  text-decoration: underline;
+}
+
 #nav-user {
   display: flex;
   align-items: center;

@@ -41,3 +41,11 @@ document.getElementById("nav-admin-btn").addEventListener("click", () => {
   showView("view-admin");
   document.dispatchEvent(new CustomEvent("admin:show"));
 });
+
+document.getElementById("brand-home-btn").addEventListener("click", () => {
+  // Solo navega al catálogo si hay una sesión activa (nav visible); antes
+  // de iniciar sesión o durante el 2FA, el clic no hace nada.
+  if (!document.getElementById("nav-user").classList.contains("hidden")) {
+    showView("view-catalog");
+  }
+});
