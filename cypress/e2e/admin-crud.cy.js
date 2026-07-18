@@ -7,18 +7,26 @@
 // del sistema antes de correr `npx cypress run`.
 
 describe("Rol admin y CRUD de catálogo", () => {
-  const email = Cypress.env("ADMIN_EMAIL");
-  const password = Cypress.env("ADMIN_PASSWORD");
-  const secret = Cypress.env("ADMIN_TOTP_SECRET");
-
+  // cy.env() (a diferencia de Cypress.env()) sigue funcionando con
+  // allowCypressEnv: false, pero solo acepta la forma de lista de claves y
+  // resuelve via .then() con un objeto { CLAVE: valor } (omite las claves
+  // sin definir), en vez de devolver el valor de forma sincrona.
   before(function () {
-    if (!email || !password || !secret) {
-      cy.log("Faltan variables de entorno ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_TOTP_SECRET — se omite esta suite.");
-      this.skip();
-    }
+    cy.env(["ADMIN_EMAIL", "ADMIN_PASSWORD", "ADMIN_TOTP_SECRET"]).then((vars) => {
+      const { ADMIN_EMAIL: email, ADMIN_PASSWORD: password, ADMIN_TOTP_SECRET: secret } = vars;
+      if (!email || !password || !secret) {
+        cy.log("Faltan variables de entorno ADMIN_EMAIL/ADMIN_PASSWORD/ADMIN_TOTP_SECRET — se omite esta suite.");
+        this.skip();
+        return;
+      }
+      this.email = email;
+      this.password = password;
+      this.secret = secret;
+    });
   });
 
-  beforeEach(() => {
+  beforeEach(function () {
+    const { email, password, secret } = this;
     cy.visit("/");
     cy.get("#auth-email").type(email);
     cy.get("#auth-password").type(password);
