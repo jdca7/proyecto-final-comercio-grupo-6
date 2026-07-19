@@ -19,7 +19,7 @@ services:
         NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
     volumes:
       - ./test-results:/app/test-results
-    command: npx jest --json --outputFile=test-results/jest-results.json
+    command: npx jest --verbose --json --outputFile=test-results/jest-results.json
 
   # docker compose run --rm test-integration
   # Resultados: se imprimen en la terminal Y quedan guardados en
