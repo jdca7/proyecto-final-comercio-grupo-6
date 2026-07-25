@@ -67,6 +67,10 @@ describe("Rol admin y CRUD de catálogo", () => {
     cy.get("#admin-price").type("9.99");
     cy.get("#admin-form").submit();
     cy.get("#admin-table").should("contain.text", "Producto Cypress");
+    // El producto nuevo se agrega al final de la tabla, fuera del viewport
+    // inicial — hacemos scroll a su fila antes de capturar para que la
+    // screenshot realmente lo muestre.
+    cy.contains("#admin-table tr", "Producto Cypress").scrollIntoView();
     cy.screenshot("CP-F07-producto-creado", { capture: "viewport" });
 
     cy.contains("#admin-table tr", "Producto Cypress").within(() => {
@@ -75,6 +79,7 @@ describe("Rol admin y CRUD de catálogo", () => {
     cy.get("#admin-price").clear().type("15.00");
     cy.get("#admin-form").submit();
     cy.get("#admin-table").should("contain.text", "$15.00");
+    cy.contains("#admin-table tr", "Producto Cypress").scrollIntoView();
     cy.screenshot("CP-F07-producto-editado", { capture: "viewport" });
 
     cy.contains("#admin-table tr", "Producto Cypress").within(() => {
