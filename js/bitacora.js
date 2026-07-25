@@ -69,6 +69,10 @@ document.addEventListener("auth:login", (e) => {
   logEvent(e.detail.user.uid, "login", `Inicio de sesión de ${e.detail.user.email}`);
 });
 
+document.addEventListener("auth:logout:manual", (e) => {
+  logEvent(e.detail.uid, "logout", "Cierre de sesión");
+});
+
 document.addEventListener("carrito:producto_agregado", (e) => {
   const { uid, product } = e.detail;
   logEvent(uid, "carrito_agregado", `Agregó "${product.title}" al carrito`);

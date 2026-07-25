@@ -86,6 +86,14 @@ form.addEventListener("submit", async (e) => {
 });
 
 document.getElementById("nav-logout-btn").addEventListener("click", async () => {
+  // Se dispara (y con eso, se registra en la bitácora) antes de cerrar
+  // sesión: una vez que signOut() completa, el usuario ya no está
+  // autenticado y las reglas de Firestore no le permitirían escribir su
+  // propio evento de bitácora.
+  const uid = auth.currentUser?.uid;
+  if (uid) {
+    document.dispatchEvent(new CustomEvent("auth:logout:manual", { detail: { uid } }));
+  }
   await signOut(auth);
 });
 
