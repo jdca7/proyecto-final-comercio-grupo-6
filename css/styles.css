@@ -444,10 +444,16 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+#admin-table td:last-child {
+  display: flex;
+  gap: 0.5rem;
+}
+
 #admin-table button {
   padding: 0.3rem 0.6rem;
   font-size: 0.85rem;
-  margin-right: 0.3rem;
+  min-width: 5.5rem;
+  text-align: center;
 }
 
 .edit-btn {
