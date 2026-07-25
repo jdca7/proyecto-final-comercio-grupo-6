@@ -9,8 +9,17 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { currentUser } from "./auth.js";
+import { isAdmin } from "./roles.js";
 
 const bodyEl = document.getElementById("bitacora-body");
+const pickerEl = document.getElementById("bitacora-user-picker");
+const selectEl = document.getElementById("bitacora-user-select");
+
+function escapeHtml(str) {
+  return String(str ?? "").replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+}
 
 async function logEvent(uid, evento, detalle) {
   if (!uid) return;
@@ -70,7 +79,34 @@ document.addEventListener("order:completed", (e) => {
   );
 });
 
-document.addEventListener("bitacora:show", () => {
+async function setupUserPicker(myUid) {
+  const snap = await getDocs(collection(db, "users"));
+  const users = [];
+  snap.forEach((d) => users.push({ uid: d.id, ...d.data() }));
+
+  selectEl.innerHTML = users
+    .map(
+      (u) =>
+        `<option value="${u.uid}">${escapeHtml(u.email || u.uid)}${u.uid === myUid ? " (tú)" : ""}</option>`
+    )
+    .join("");
+  selectEl.value = myUid;
+  pickerEl.classList.remove("hidden");
+}
+
+document.addEventListener("bitacora:show", async () => {
   const user = currentUser();
-  if (user) renderBitacora(user.uid);
+  if (!user) return;
+
+  if (isAdmin()) {
+    await setupUserPicker(user.uid);
+    renderBitacora(selectEl.value);
+  } else {
+    pickerEl.classList.add("hidden");
+    renderBitacora(user.uid);
+  }
+});
+
+selectEl.addEventListener("change", () => {
+  renderBitacora(selectEl.value);
 });

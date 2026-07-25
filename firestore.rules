@@ -34,11 +34,14 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // bitacora/{eventId}: eventos de login y compra. Solo lectura y
-    // creación de eventos propios; no se permite modificar ni eliminar
-    // eventos existentes (bitácora de solo agregar).
+    // bitacora/{eventId}: eventos de login y compra. Un usuario puede leer
+    // y crear solo sus propios eventos; un admin puede además leer los
+    // eventos de cualquier usuario (panel de bitácora del administrador).
+    // No se permite modificar ni eliminar eventos existentes (bitácora de
+    // solo agregar).
     match /bitacora/{eventId} {
-      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow read: if request.auth != null &&
+        (resource.data.uid == request.auth.uid || isAdmin());
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
       allow update, delete: if false;
     }

@@ -338,6 +338,20 @@ button:disabled {
   color: var(--color-success-dark);
 }
 
+#bitacora-user-picker {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+#bitacora-user-picker select {
+  padding: 0.3rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
 #bitacora-table {
   width: 100%;
   border-collapse: collapse;
