@@ -79,18 +79,26 @@ itemsEl.addEventListener("click", async (e) => {
   const item = items.find((it) => it.id === id);
   if (!item) return;
 
+  let removedItem = null;
   if (e.target.classList.contains("qty-plus")) {
     items = changeQuantity(items, id, 1);
   } else if (e.target.classList.contains("qty-minus")) {
     items = changeQuantity(items, id, -1);
   } else if (e.target.classList.contains("remove")) {
     items = removeItem(items, id);
+    removedItem = item;
   } else {
     return;
   }
   await saveCart();
   updateCartBadge();
   renderCart();
+
+  if (removedItem) {
+    document.dispatchEvent(
+      new CustomEvent("carrito:producto_eliminado", { detail: { uid: currentUid, product: removedItem } })
+    );
+  }
 });
 
 document.getElementById("cart-back-btn").addEventListener("click", () => {
@@ -106,6 +114,9 @@ document.addEventListener("cart:add", async (e) => {
   items = addOrIncrement(items, e.detail.product);
   await saveCart();
   updateCartBadge();
+  document.dispatchEvent(
+    new CustomEvent("carrito:producto_agregado", { detail: { uid: currentUid, product: e.detail.product } })
+  );
 });
 
 document.addEventListener("cart:show", renderCart);

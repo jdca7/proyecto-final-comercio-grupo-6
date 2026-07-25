@@ -69,6 +69,16 @@ document.addEventListener("auth:login", (e) => {
   logEvent(e.detail.user.uid, "login", `Inicio de sesión de ${e.detail.user.email}`);
 });
 
+document.addEventListener("carrito:producto_agregado", (e) => {
+  const { uid, product } = e.detail;
+  logEvent(uid, "carrito_agregado", `Agregó "${product.title}" al carrito`);
+});
+
+document.addEventListener("carrito:producto_eliminado", (e) => {
+  const { uid, product } = e.detail;
+  logEvent(uid, "carrito_eliminado", `Eliminó "${product.title}" del carrito`);
+});
+
 document.addEventListener("order:completed", (e) => {
   const { order, user } = e.detail;
   if (!user) return;
