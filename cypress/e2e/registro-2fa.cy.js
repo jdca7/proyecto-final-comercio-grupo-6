@@ -29,5 +29,6 @@ describe("Registro y verificación en dos pasos (2FA)", () => {
 
     cy.get("#view-catalog", { timeout: 10000 }).should("not.have.class", "hidden");
     cy.get("#catalog-grid .product-card").should("have.length.greaterThan", 0);
+    cy.screenshot("CP-F01-catalogo-tras-2fa", { capture: "viewport" });
   });
 });

@@ -57,6 +57,7 @@ describe("Carrito y checkout", () => {
   it("CP-F02: agregar un producto al carrito actualiza el contador", () => {
     addFirstProductToCart();
     cy.get("#nav-cart-count").should("have.text", "1");
+    cy.screenshot("CP-F02-contador-carrito", { capture: "viewport" });
   });
 
   it("CP-F03: completa una compra con tarjeta aprobada", () => {
@@ -72,6 +73,7 @@ describe("Carrito y checkout", () => {
 
     cy.get("#view-confirmation", { timeout: 10000 }).should("not.have.class", "hidden");
     cy.get("#confirmation-details").should("contain.text", "aprobada");
+    cy.screenshot("CP-F03-compra-aprobada", { capture: "viewport" });
   });
 
   it("CP-F04: una tarjeta de prueba de rechazo muestra el error y no vacía el carrito", () => {
@@ -88,6 +90,7 @@ describe("Carrito y checkout", () => {
     cy.get("#checkout-error").should("be.visible").and("contain.text", "rechazada");
     cy.get("#view-confirmation").should("have.class", "hidden");
     cy.get("#nav-cart-count").should("have.text", "1");
+    cy.screenshot("CP-F04-compra-rechazada", { capture: "viewport" });
   });
 
   it("CP-F05: la bitácora registra el login y la compra del usuario", () => {
@@ -104,5 +107,6 @@ describe("Carrito y checkout", () => {
     cy.get("#nav-bitacora-btn").click();
     cy.get("#bitacora-body", { timeout: 10000 }).should("contain.text", "login");
     cy.get("#bitacora-body").should("contain.text", "compra");
+    cy.screenshot("CP-F05-bitacora-con-eventos", { capture: "viewport" });
   });
 });

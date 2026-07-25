@@ -67,6 +67,7 @@ describe("Rol admin y CRUD de catálogo", () => {
     cy.get("#admin-price").type("9.99");
     cy.get("#admin-form").submit();
     cy.get("#admin-table").should("contain.text", "Producto Cypress");
+    cy.screenshot("CP-F07-producto-creado", { capture: "viewport" });
 
     cy.contains("#admin-table tr", "Producto Cypress").within(() => {
       cy.get(".edit-btn").click();
@@ -74,6 +75,7 @@ describe("Rol admin y CRUD de catálogo", () => {
     cy.get("#admin-price").clear().type("15.00");
     cy.get("#admin-form").submit();
     cy.get("#admin-table").should("contain.text", "$15.00");
+    cy.screenshot("CP-F07-producto-editado", { capture: "viewport" });
 
     cy.contains("#admin-table tr", "Producto Cypress").within(() => {
       cy.get(".delete-btn").click();
