@@ -12,7 +12,7 @@
     <nav id="nav-user" class="hidden">
       <span id="nav-email"></span>
       <button id="nav-cart-btn">Carrito (<span id="nav-cart-count">0</span>)</button>
-      <button id="nav-bitacora-btn">Bitácora</button>
+      <button id="nav-bitacora-btn">Historial de actividad</button>
       <button id="nav-admin-btn" class="hidden">Administración</button>
       <button id="nav-logout-btn">Cerrar sesión</button>
     </nav>
@@ -165,10 +165,11 @@
       </div>
     </section>
 
-    <!-- Vista: Bitácora -->
+    <!-- Vista: Bitácora (nombre técnico interno; la interfaz la muestra
+         al cliente como "Historial de actividad") -->
     <section id="view-bitacora" class="view hidden">
-      <h2>Bitácora de transacciones</h2>
-      <label id="bitacora-user-picker" class="hidden">Ver bitácora de
+      <h2 id="bitacora-title">Historial de actividad</h2>
+      <label id="bitacora-user-picker" class="hidden">Ver historial de
         <select id="bitacora-user-select"></select>
       </label>
       <table id="bitacora-table">

@@ -12,6 +12,7 @@ import { currentUser } from "./auth.js";
 import { isAdmin } from "./roles.js";
 
 const bodyEl = document.getElementById("bitacora-body");
+const titleEl = document.getElementById("bitacora-title");
 const pickerEl = document.getElementById("bitacora-user-picker");
 const selectEl = document.getElementById("bitacora-user-select");
 
@@ -94,6 +95,15 @@ async function setupUserPicker(myUid) {
   pickerEl.classList.remove("hidden");
 }
 
+function updateTitle() {
+  const selected = selectEl.selectedOptions[0];
+  const label = selected ? selected.textContent.replace(/\s*\(tú\)$/, "") : "";
+  titleEl.textContent =
+    pickerEl.classList.contains("hidden") || selected?.value === currentUser()?.uid
+      ? "Historial de actividad"
+      : `Historial de actividad de ${label}`;
+}
+
 document.addEventListener("bitacora:show", async () => {
   const user = currentUser();
   if (!user) return;
@@ -101,12 +111,15 @@ document.addEventListener("bitacora:show", async () => {
   if (isAdmin()) {
     await setupUserPicker(user.uid);
     renderBitacora(selectEl.value);
+    updateTitle();
   } else {
     pickerEl.classList.add("hidden");
+    titleEl.textContent = "Historial de actividad";
     renderBitacora(user.uid);
   }
 });
 
 selectEl.addEventListener("change", () => {
   renderBitacora(selectEl.value);
+  updateTitle();
 });
