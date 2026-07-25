@@ -22,6 +22,7 @@ export function isAdmin() {
 }
 
 const adminBtn = document.getElementById("nav-admin-btn");
+const bitacoraBtn = document.getElementById("nav-bitacora-btn");
 
 async function loadRole(user) {
   const userRef = doc(db, "users", user.uid);
@@ -41,6 +42,11 @@ async function loadRole(user) {
   }
 
   adminBtn.classList.toggle("hidden", !isAdmin());
+  // Para el cliente el nombre "Historial de actividad" es más natural;
+  // para el admin (que además puede consultar el historial de cualquier
+  // usuario) el término técnico "Bitácora" refleja mejor su función de
+  // auditoría.
+  bitacoraBtn.textContent = isAdmin() ? "Bitácora" : "Historial de actividad";
   document.dispatchEvent(new CustomEvent("role:ready", { detail: { role: currentRole } }));
 }
 
@@ -51,4 +57,5 @@ document.addEventListener("auth:login", (e) => {
 document.addEventListener("auth:logout", () => {
   currentRole = "cliente";
   adminBtn.classList.add("hidden");
+  bitacoraBtn.textContent = "Historial de actividad";
 });

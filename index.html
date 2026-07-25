@@ -165,11 +165,12 @@
       </div>
     </section>
 
-    <!-- Vista: Bitácora (nombre técnico interno; la interfaz la muestra
-         al cliente como "Historial de actividad") -->
+    <!-- Vista: Bitácora. El cliente la ve como "Historial de actividad";
+         el admin (que puede consultar la de cualquier usuario) la ve
+         como "Bitácora", texto controlado dinámicamente por bitacora.js -->
     <section id="view-bitacora" class="view hidden">
       <h2 id="bitacora-title">Historial de actividad</h2>
-      <label id="bitacora-user-picker" class="hidden">Ver historial de
+      <label id="bitacora-user-picker" class="hidden">Ver bitácora de
         <select id="bitacora-user-select"></select>
       </label>
       <table id="bitacora-table">

@@ -99,9 +99,7 @@ function updateTitle() {
   const selected = selectEl.selectedOptions[0];
   const label = selected ? selected.textContent.replace(/\s*\(tú\)$/, "") : "";
   titleEl.textContent =
-    pickerEl.classList.contains("hidden") || selected?.value === currentUser()?.uid
-      ? "Historial de actividad"
-      : `Historial de actividad de ${label}`;
+    selected?.value === currentUser()?.uid ? "Bitácora" : `Bitácora de ${label}`;
 }
 
 document.addEventListener("bitacora:show", async () => {
