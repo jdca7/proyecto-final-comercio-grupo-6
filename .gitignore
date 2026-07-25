@@ -1,4 +1,10 @@
 node_modules/
+
+# Clave de servicio de Firebase (credencial administrativa) — nunca se sube
+.secrets/
+*firebase-adminsdk*.json
+serviceAccountKey.json
+
 cypress/screenshots/*
 !cypress/screenshots/.gitkeep
 cypress/videos/*
