@@ -16,6 +16,8 @@ describe("Registro y verificación en dos pasos (2FA)", () => {
     cy.get("#auth-submit-btn").click();
 
     cy.get("#view-2fa-setup", { timeout: 10000 }).should("not.have.class", "hidden");
+    // 1. La app pide configurar el 2FA y muestra la clave secreta.
+    cy.screenshot("CP-F01-1-pide-configurar-2fa", { capture: "viewport" });
 
     cy.get("#twofa-setup-secret")
       .invoke("text")
@@ -23,12 +25,15 @@ describe("Registro y verificación en dos pasos (2FA)", () => {
         const secret = secretText.replace(/\s/g, "");
         cy.task("computeTotp", { secret, atMillis: Date.now() }).then((code) => {
           cy.get("#twofa-setup-code").type(code);
+          // 2. El código de 6 dígitos ya está ingresado, antes de confirmar.
+          cy.screenshot("CP-F01-2-codigo-ingresado", { capture: "viewport" });
           cy.get("#twofa-setup-form").submit();
         });
       });
 
+    // 3. El código fue aceptado y ya se puede ingresar al catálogo.
     cy.get("#view-catalog", { timeout: 10000 }).should("not.have.class", "hidden");
     cy.get("#catalog-grid .product-card").should("have.length.greaterThan", 0);
-    cy.screenshot("CP-F01-catalogo-tras-2fa", { capture: "viewport" });
+    cy.screenshot("CP-F01-3-catalogo-tras-2fa", { capture: "viewport" });
   });
 });
