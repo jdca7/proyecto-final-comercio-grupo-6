@@ -29,21 +29,26 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // carts/{uid}: carrito de compras del usuario autenticado.
+    // carts/{uid}: carrito de compras del usuario autenticado. Un admin
+    // puede además borrar el carrito de cualquier usuario (al eliminar su
+    // cuenta desde el panel de administración de usuarios).
     match /carts/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow delete: if isAdmin();
     }
 
     // bitacora/{eventId}: eventos de login y compra. Un usuario puede leer
-    // y crear solo sus propios eventos; un admin puede además leer los
-    // eventos de cualquier usuario (panel de bitácora del administrador).
-    // No se permite modificar ni eliminar eventos existentes (bitácora de
-    // solo agregar).
+    // y crear solo sus propios eventos, nunca modificarlos ni eliminarlos.
+    // Un admin puede además leer los eventos de cualquier usuario (panel de
+    // bitácora del administrador) y eliminarlos — usado por admin-users.js
+    // para borrar en cascada la bitácora de una cuenta eliminada y evitar
+    // que queden huérfanos acumulados.
     match /bitacora/{eventId} {
       allow read: if request.auth != null &&
         (resource.data.uid == request.auth.uid || isAdmin());
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if false;
+      allow update: if false;
+      allow delete: if isAdmin();
     }
 
     // Cualquier otra ruta queda denegada por defecto.

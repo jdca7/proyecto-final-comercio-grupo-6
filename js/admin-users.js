@@ -1,18 +1,21 @@
 // Administración de usuarios (solo rol admin): listar todos los usuarios,
-// cambiar su rol, y eliminar su documento de datos de la app.
+// cambiar su rol, y eliminar todos sus datos de la app (documento de
+// usuario, carrito, y su bitácora completa).
 //
-// Limitación importante: eliminar aquí borra el documento del usuario en
-// Firestore (su rol y sus datos de 2FA) — NO elimina la cuenta de acceso
-// (correo/contraseña) de Firebase Authentication. Eso requeriría el SDK de
-// administración de Firebase desde un backend con credenciales de servicio,
-// algo que este proyecto no usa a propósito (arquitectura sin servidor). Si
-// esa persona vuelve a iniciar sesión, la app la tratará como una cuenta
-// nueva (rol "cliente", 2FA por configurar de cero).
+// Limitación importante: eliminar aquí borra los datos del usuario en
+// Firestore — NO elimina la cuenta de acceso (correo/contraseña) de
+// Firebase Authentication. Eso requeriría el SDK de administración de
+// Firebase desde un backend con credenciales de servicio, algo que este
+// proyecto no usa a propósito (arquitectura sin servidor). Si esa persona
+// vuelve a iniciar sesión, la app la tratará como una cuenta nueva (rol
+// "cliente", 2FA por configurar de cero).
 
 import { db } from "./firebase-config.js";
 import {
   collection,
   getDocs,
+  query,
+  where,
   doc,
   setDoc,
   deleteDoc,
@@ -37,10 +40,10 @@ async function render() {
   }
 
   statusEl.textContent =
-    "Nota: eliminar un usuario borra su rol y sus datos de 2FA en la app. " +
-    "Su cuenta de acceso (correo/contraseña) sigue existiendo en Firebase " +
-    "Authentication — eliminarla por completo requeriría un backend con " +
-    "permisos administrativos, que este proyecto no usa.";
+    "Nota: eliminar un usuario borra su rol, sus datos de 2FA, su carrito y " +
+    "toda su bitácora en la app. Su cuenta de acceso (correo/contraseña) sigue " +
+    "existiendo en Firebase Authentication — eliminarla por completo " +
+    "requeriría un backend con permisos administrativos, que este proyecto no usa.";
   contentEl.innerHTML = "Cargando usuarios...";
 
   const myUid = currentUser()?.uid;
@@ -99,6 +102,11 @@ async function handleDelete(uid) {
   if (uid === currentUser()?.uid) return; // defensa extra, el botón ya está deshabilitado
   try {
     await deleteDoc(doc(db, "users", uid));
+    await deleteDoc(doc(db, "carts", uid)).catch(() => {});
+
+    const bitacoraSnap = await getDocs(query(collection(db, "bitacora"), where("uid", "==", uid)));
+    await Promise.all(bitacoraSnap.docs.map((d) => deleteDoc(d.ref)));
+
     render();
   } catch (err) {
     statusEl.textContent = "Error al eliminar el usuario: " + err.message;
