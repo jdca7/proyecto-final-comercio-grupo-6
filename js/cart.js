@@ -84,6 +84,9 @@ itemsEl.addEventListener("click", async (e) => {
     items = changeQuantity(items, id, 1);
   } else if (e.target.classList.contains("qty-minus")) {
     items = changeQuantity(items, id, -1);
+    // Decrementar hasta 0 elimina el producto del carrito (ver
+    // lib/cart-utils.js), así que cuenta como quitarlo para la bitácora.
+    if (item.qty === 1) removedItem = item;
   } else if (e.target.classList.contains("remove")) {
     items = removeItem(items, id);
     removedItem = item;
