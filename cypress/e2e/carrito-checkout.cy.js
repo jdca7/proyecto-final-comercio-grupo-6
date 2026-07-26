@@ -40,10 +40,10 @@ function registerAndPass2fa(email, password) {
 function addFirstProductToCart(screenshotName) {
   cy.get("#catalog-grid .product-card").first().as("firstProduct");
   if (screenshotName) {
-    // Captura el producto en sí (imagen, título, precio), no solo el botón,
-    // como evidencia de qué se está agregando al carrito.
-    cy.get("@firstProduct").scrollIntoView();
-    cy.screenshot(screenshotName, { capture: "viewport" });
+    // Captura solo la tarjeta del producto (imagen, título, precio y
+    // botón), no toda la pantalla — así siempre se ve el producto
+    // completo sin depender de cuánto haya que hacer scroll.
+    cy.get("@firstProduct").screenshot(screenshotName);
   }
   cy.get("@firstProduct").within(() => cy.get("button").click());
 }
@@ -60,16 +60,17 @@ describe("Carrito y checkout", () => {
   });
 
   it("CP-F02: agregar un producto al carrito actualiza el contador", () => {
-    addFirstProductToCart("CP-F02-producto-a-agregar");
+    // Único test donde importa mostrar el producto en sí, ya que es
+    // justo lo que este caso está probando.
+    addFirstProductToCart("CP-F02-producto-agregado");
     cy.get("#nav-cart-count").should("have.text", "1");
-    cy.screenshot("CP-F02-contador-carrito", { capture: "viewport" });
   });
 
   it("CP-F03: completa una compra con tarjeta aprobada", () => {
-    addFirstProductToCart("CP-F03-producto-a-agregar");
+    addFirstProductToCart();
     cy.get("#nav-cart-btn").click();
     cy.get("#cart-items .cart-row").should("have.length.greaterThan", 0);
-    cy.screenshot("CP-F03-carrito-con-productos", { capture: "viewport" });
+    cy.get("#cart-items").screenshot("CP-F03-1-carrito-antes-de-pagar");
     cy.get("#cart-checkout-btn").click();
 
     cy.get("#checkout-name").type("Cypress Test");
@@ -80,14 +81,13 @@ describe("Carrito y checkout", () => {
 
     cy.get("#view-confirmation", { timeout: 10000 }).should("not.have.class", "hidden");
     cy.get("#confirmation-details").should("contain.text", "aprobada");
-    cy.screenshot("CP-F03-compra-aprobada", { capture: "viewport" });
+    cy.get("#view-confirmation").screenshot("CP-F03-2-compra-aprobada");
   });
 
   it("CP-F04: una tarjeta de prueba de rechazo muestra el error y no vacía el carrito", () => {
-    addFirstProductToCart("CP-F04-producto-a-agregar");
+    addFirstProductToCart();
     cy.get("#nav-cart-btn").click();
     cy.get("#cart-items .cart-row").should("have.length.greaterThan", 0);
-    cy.screenshot("CP-F04-carrito-con-productos", { capture: "viewport" });
     cy.get("#cart-checkout-btn").click();
 
     cy.get("#checkout-name").type("Cypress Test");
@@ -99,11 +99,11 @@ describe("Carrito y checkout", () => {
     cy.get("#checkout-error").should("be.visible").and("contain.text", "rechazada");
     cy.get("#view-confirmation").should("have.class", "hidden");
     cy.get("#nav-cart-count").should("have.text", "1");
-    cy.screenshot("CP-F04-compra-rechazada", { capture: "viewport" });
+    cy.get("#checkout-form").screenshot("CP-F04-compra-rechazada");
   });
 
   it("CP-F05: la bitácora registra el login y la compra del usuario", () => {
-    addFirstProductToCart("CP-F05-producto-a-agregar");
+    addFirstProductToCart();
     cy.get("#nav-cart-btn").click();
     cy.get("#cart-checkout-btn").click();
     cy.get("#checkout-name").type("Cypress Test");
