@@ -6,14 +6,17 @@ FROM cypress/browsers:latest
 
 WORKDIR /app
 
-# Por defecto se valida TLS normalmente (seguro). Solo se relaja si se pasan
-# explicitamente estos build-args en false/0 (util unicamente detras de un
-# proxy con certificado propio, como en algunos entornos corporativos o de
-# CI). NPM_CONFIG_STRICT_SSL cubre las descargas del registro de npm;
-# NODE_TLS_REJECT_UNAUTHORIZED cubre la descarga del binario de Cypress,
-# que se hace por fuera del cliente de npm.
-ARG NPM_CONFIG_STRICT_SSL=true
-ARG NODE_TLS_REJECT_UNAUTHORIZED=1
+# Por defecto NO se valida TLS al construir esta imagen (docker-compose.yml
+# pasa estos build-args en false/0). Es una decision deliberada para que
+# ningun integrante del equipo tenga que configurar nada aunque su red
+# (institucional, corporativa, o cierto antivirus) intercepte HTTPS con un
+# certificado propio -- error tipico: SELF_SIGNED_CERT_IN_CHAIN. El riesgo
+# se acota a paquetes de npm/Cypress descargados solo para esta imagen de
+# pruebas desechable; la imagen de la app (Dockerfile) nunca usa esto.
+# Si se prefiere verificacion estricta, pasar NPM_CONFIG_STRICT_SSL=true y
+# NODE_TLS_REJECT_UNAUTHORIZED=1 como variables de entorno antes de construir.
+ARG NPM_CONFIG_STRICT_SSL=false
+ARG NODE_TLS_REJECT_UNAUTHORIZED=0
 ENV NPM_CONFIG_STRICT_SSL=$NPM_CONFIG_STRICT_SSL
 ENV NODE_TLS_REJECT_UNAUTHORIZED=$NODE_TLS_REJECT_UNAUTHORIZED
 

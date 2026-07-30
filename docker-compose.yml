@@ -10,13 +10,20 @@ services:
   # docker compose run --rm test-unit
   # Resultados: se imprimen en la terminal Y quedan guardados en
   # ./test-results/jest-results.json
+  #
+  # NPM_CONFIG_STRICT_SSL/NODE_TLS_REJECT_UNAUTHORIZED por defecto en
+  # false/0: para que nadie del equipo necesite configurar nada aunque su
+  # red intercepte HTTPS con un certificado propio (SELF_SIGNED_CERT_IN_CHAIN).
+  # Solo afecta la descarga de paquetes al construir esta imagen de pruebas
+  # desechable, nunca a la app. Para verificacion estricta, definir un .env
+  # con NPM_CONFIG_STRICT_SSL=true y NODE_TLS_REJECT_UNAUTHORIZED=1.
   test-unit:
     build:
       context: .
       dockerfile: Dockerfile.tests
       args:
-        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
-        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-false}
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-0}
     volumes:
       - ./test-results:/app/test-results
     command: npx jest --verbose --json --outputFile=test-results/jest-results.json
@@ -29,8 +36,8 @@ services:
       context: .
       dockerfile: Dockerfile.tests
       args:
-        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
-        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-false}
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-0}
     volumes:
       - ./test-results:/app/test-results
     command: npx newman run tests/postman/FakeStoreAPI.postman_collection.json --reporters cli,json --reporter-json-export test-results/newman-results.json
@@ -44,8 +51,8 @@ services:
       context: .
       dockerfile: Dockerfile.tests
       args:
-        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-true}
-        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-1}
+        NPM_CONFIG_STRICT_SSL: ${NPM_CONFIG_STRICT_SSL:-false}
+        NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED:-0}
     depends_on:
       - app
     # Comparte la red del contenedor "app" para que Cypress vea la app como

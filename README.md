@@ -245,26 +245,26 @@ cálculo real del código TOTP, login, carrito, checkout (aprobado/rechazado),
 bitácora y CRUD de catálogo — todo contra el Firebase y FakeStoreAPI reales
 del proyecto, no mocks.
 
-### Solución de problemas: "self-signed certificate in certificate chain"
+### Nota sobre certificados TLS al construir las imágenes de prueba
 
-Si al construir la imagen de pruebas (`docker compose run --rm test-unit` o
-cualquiera de las otras) ves un error como `SELF_SIGNED_CERT_IN_CHAIN` al
-correr `npm ci`, significa que tu red (institucional, corporativa, o cierto
-antivirus) está inspeccionando el tráfico HTTPS con su propio certificado, y
-Docker no confía en él por defecto — no es un problema del proyecto.
+Por defecto, `docker-compose.yml` construye las imágenes de prueba
+(`test-unit`, `test-integration`, `test-e2e`) **sin verificar certificados
+TLS** al descargar paquetes de npm. Es una decisión deliberada: así nadie del
+equipo necesita configurar nada aunque su red (institucional, corporativa, o
+cierto antivirus) intercepte HTTPS con su propio certificado — el error típico
+en ese caso sería `SELF_SIGNED_CERT_IN_CHAIN`. Esto solo afecta la descarga de
+paquetes al construir esa imagen desechable de pruebas; **nunca** a la imagen
+de la app (`Dockerfile`), que no usa npm.
 
-Solución: crear un archivo `.env` en la raíz del proyecto (ya está en
-`.gitignore`, nunca se sube) con:
+Si preferís verificación estricta de certificados (por ejemplo, en un entorno
+donde te importa mitigar el riesgo de un ataque man-in-the-middle durante el
+build), creá un archivo `.env` en la raíz del proyecto (ya está en
+`.gitignore`) con:
 
 ```
-NPM_CONFIG_STRICT_SSL=false
-NODE_TLS_REJECT_UNAUTHORIZED=0
+NPM_CONFIG_STRICT_SSL=true
+NODE_TLS_REJECT_UNAUTHORIZED=1
 ```
-
-Esto relaja la verificación de certificados **solo dentro del contenedor de
-pruebas**, nunca en la app en sí ni en el repositorio. Si no tienes este
-problema, no hace falta crear este archivo — por defecto todo se valida
-normalmente.
 
 ## Documentación adicional
 
