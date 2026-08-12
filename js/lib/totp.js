@@ -8,6 +8,8 @@ export const TIME_STEP_SECONDS = 30;
 export const CODE_DIGITS = 6;
 export const VERIFY_WINDOW = 1; // tolera +/- 1 paso de 30s por desfase de reloj
 
+// Codifica bytes crudos a texto base32 (el formato en que se muestra/ingresa
+// la clave secreta en las apps de autenticación).
 export function base32Encode(bytes) {
   let bits = "";
   for (const byte of bytes) bits += byte.toString(2).padStart(8, "0");
@@ -21,6 +23,7 @@ export function base32Encode(bytes) {
   return output;
 }
 
+// Decodifica texto base32 de vuelta a los bytes originales.
 export function base32Decode(str) {
   const clean = str.toUpperCase().replace(/[^A-Z2-7]/g, "");
   let bits = "";
@@ -36,18 +39,21 @@ export function base32Decode(str) {
   return new Uint8Array(bytes);
 }
 
+// Genera una clave secreta aleatoria de 20 bytes (160 bits) para el 2FA de un usuario.
 export function generateSecret() {
   const bytes = new Uint8Array(20);
   crypto.getRandomValues(bytes);
   return base32Encode(bytes);
 }
 
+// Convierte el contador de pasos de tiempo a 8 bytes big-endian, como lo pide HOTP.
 export function counterToBytes(counter) {
   const buf = new ArrayBuffer(8);
   new DataView(buf).setBigUint64(0, BigInt(counter), false);
   return new Uint8Array(buf);
 }
 
+// Calcula el código HOTP (RFC 4226) de 6 dígitos para una clave y un contador dados.
 export async function hotp(secretBytes, counter) {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -68,11 +74,14 @@ export async function hotp(secretBytes, counter) {
   return otp.toString().padStart(CODE_DIGITS, "0");
 }
 
+// Calcula el código TOTP (RFC 6238) vigente para una clave secreta en un instante dado.
 export async function totpAt(secretBase32, unixMillis) {
   const counter = Math.floor(unixMillis / 1000 / TIME_STEP_SECONDS);
   return hotp(base32Decode(secretBase32), counter);
 }
 
+// Verifica un código ingresado por el usuario contra el código esperado,
+// tolerando un pequeño desfase de reloj (+/- VERIFY_WINDOW pasos de 30s).
 export async function verifyTotp(secretBase32, code, now = Date.now()) {
   const secretBytes = base32Decode(secretBase32);
   const currentCounter = Math.floor(now / 1000 / TIME_STEP_SECONDS);
@@ -84,6 +93,7 @@ export async function verifyTotp(secretBase32, code, now = Date.now()) {
   return false;
 }
 
+// Formatea la clave secreta en grupos de 4 caracteres, para que sea más legible en pantalla.
 export function formatSecret(secret) {
   return secret.match(/.{1,4}/g).join(" ");
 }

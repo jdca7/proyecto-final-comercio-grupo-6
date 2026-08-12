@@ -18,20 +18,24 @@ const errorEl = document.getElementById("auth-error");
 const emailInput = document.getElementById("auth-email");
 const passwordInput = document.getElementById("auth-password");
 
+// Devuelve el usuario de Firebase actualmente logueado (o null si no hay sesión).
 export function currentUser() {
   return auth.currentUser;
 }
 
+// Muestra un mensaje de error debajo del formulario de login/registro.
 function showAuthError(message) {
   errorEl.textContent = message;
   errorEl.classList.remove("hidden");
 }
 
+// Oculta el mensaje de error del formulario de login/registro.
 function clearAuthError() {
   errorEl.textContent = "";
   errorEl.classList.add("hidden");
 }
 
+// Traduce los códigos de error de Firebase Auth a mensajes en español.
 function mapAuthError(err) {
   switch (err.code) {
     case "auth/invalid-email":
@@ -49,6 +53,7 @@ function mapAuthError(err) {
   }
 }
 
+// Alterna el formulario entre modo "iniciar sesión" y modo "registrarse".
 toggleLink.addEventListener("click", (e) => {
   e.preventDefault();
   clearAuthError();
@@ -67,6 +72,7 @@ toggleLink.addEventListener("click", (e) => {
   }
 });
 
+// Registra una cuenta nueva o inicia sesión, según el modo actual del formulario.
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearAuthError();
@@ -97,6 +103,9 @@ document.getElementById("nav-logout-btn").addEventListener("click", async () => 
   await signOut(auth);
 });
 
+// Reacciona a cada cambio de sesión de Firebase: si hay usuario, muestra la
+// app y avisa a los demás módulos (roles.js, twofa.js, etc.); si no, muestra
+// la pantalla de login.
 onAuthStateChanged(auth, (user) => {
   document.getElementById("loading-screen").classList.add("hidden");
   if (user) {

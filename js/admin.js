@@ -16,10 +16,12 @@ const API_BASE = "https://fakestoreapi.com/products";
 
 let editingId = null;
 
+// Valores por defecto del formulario cuando se va a crear un producto nuevo.
 function emptyForm() {
   return { title: "", price: "", description: "", image: "", category: "" };
 }
 
+// Dibuja el formulario (crear/editar) y la tabla de productos del panel admin.
 function render() {
   if (!isAdmin()) {
     statusEl.textContent = "Acceso restringido: esta sección es solo para administradores.";
@@ -90,6 +92,7 @@ function render() {
   });
 }
 
+// Escapa texto para insertarlo de forma segura dentro de HTML (evita XSS).
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -99,6 +102,8 @@ function escapeAttr(str) {
   return escapeHtml(str ?? "");
 }
 
+// Crea un producto nuevo o guarda los cambios de uno existente, según si hay
+// un producto en edición (editingId).
 async function handleSubmit(e) {
   e.preventDefault();
   const body = {
@@ -141,6 +146,7 @@ async function handleSubmit(e) {
   }
 }
 
+// Elimina un producto del catálogo.
 async function handleDelete(id) {
   try {
     const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
@@ -153,6 +159,7 @@ async function handleDelete(id) {
   }
 }
 
+// Prepara el panel admin cada vez que se abre (empieza en la pestaña de catálogo).
 document.addEventListener("admin:show", () => {
   editingId = null;
   render();
@@ -166,6 +173,7 @@ const tabUsersBtn = document.getElementById("admin-tab-users");
 const panelCatalog = document.getElementById("admin-panel-catalog");
 const panelUsers = document.getElementById("admin-panel-users");
 
+// Cambia a la pestaña "Catálogo" del panel admin.
 function showCatalogTab() {
   tabCatalogBtn.classList.add("active");
   tabUsersBtn.classList.remove("active");
@@ -173,6 +181,7 @@ function showCatalogTab() {
   panelUsers.classList.add("hidden");
 }
 
+// Cambia a la pestaña "Usuarios" del panel admin y pide que se dibuje la lista.
 function showUsersTab() {
   tabCatalogBtn.classList.remove("active");
   tabUsersBtn.classList.add("active");

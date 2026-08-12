@@ -26,12 +26,15 @@ import { currentUser } from "./auth.js";
 const statusEl = document.getElementById("admin-users-status");
 const contentEl = document.getElementById("admin-users-content");
 
+// Escapa texto para insertarlo de forma segura dentro de HTML (evita XSS).
 function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   }[c]));
 }
 
+// Dibuja la tabla con todos los usuarios registrados (correo, rol, 2FA,
+// acciones), deshabilitando las acciones sobre la propia fila del admin.
 async function render() {
   if (!isAdmin()) {
     statusEl.textContent = "Acceso restringido: esta sección es solo para administradores.";
@@ -89,6 +92,7 @@ async function render() {
   });
 }
 
+// Cambia el rol (cliente/admin) de un usuario.
 async function handleRoleChange(uid, newRole) {
   try {
     await setDoc(doc(db, "users", uid), { role: newRole }, { merge: true });
@@ -98,6 +102,8 @@ async function handleRoleChange(uid, newRole) {
   }
 }
 
+// Elimina por completo los datos de un usuario: su documento de perfil, su
+// carrito, y todos sus eventos de bitácora.
 async function handleDelete(uid) {
   if (uid === currentUser()?.uid) return; // defensa extra, el botón ya está deshabilitado
   try {

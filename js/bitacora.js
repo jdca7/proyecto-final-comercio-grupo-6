@@ -16,12 +16,14 @@ const titleEl = document.getElementById("bitacora-title");
 const pickerEl = document.getElementById("bitacora-user-picker");
 const selectEl = document.getElementById("bitacora-user-select");
 
+// Escapa texto para insertarlo de forma segura dentro de HTML (evita XSS).
 function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   }[c]));
 }
 
+// Crea un evento nuevo en la bitácora (login, logout, compra, carrito, etc.).
 async function logEvent(uid, evento, detalle) {
   if (!uid) return;
   try {
@@ -39,6 +41,7 @@ async function logEvent(uid, evento, detalle) {
   }
 }
 
+// Dibuja la tabla de eventos de bitácora de un usuario, del más reciente al más antiguo.
 async function renderBitacora(uid) {
   bodyEl.innerHTML = "<tr><td colspan='3'>Cargando...</td></tr>";
   try {
@@ -65,24 +68,29 @@ async function renderBitacora(uid) {
   }
 }
 
+// Registra el login en la bitácora.
 document.addEventListener("auth:login", (e) => {
   logEvent(e.detail.user.uid, "login", `Inicio de sesión de ${e.detail.user.email}`);
 });
 
+// Registra el logout en la bitácora.
 document.addEventListener("auth:logout:manual", (e) => {
   logEvent(e.detail.uid, "logout", "Cierre de sesión");
 });
 
+// Registra que se agregó un producto al carrito.
 document.addEventListener("carrito:producto_agregado", (e) => {
   const { uid, product } = e.detail;
   logEvent(uid, "carrito_agregado", `Agregó "${product.title}" al carrito`);
 });
 
+// Registra que se quitó un producto del carrito (incluye bajar la cantidad hasta 0).
 document.addEventListener("carrito:producto_eliminado", (e) => {
   const { uid, product } = e.detail;
   logEvent(uid, "carrito_eliminado", `Eliminó "${product.title}" del carrito`);
 });
 
+// Registra el resultado de una compra (aprobada o rechazada, con motivo).
 document.addEventListener("order:completed", (e) => {
   const { order, user } = e.detail;
   if (!user) return;
@@ -94,6 +102,8 @@ document.addEventListener("order:completed", (e) => {
   );
 });
 
+// Llena el selector de usuarios (solo visible para admins) para elegir de
+// quién ver el historial, dejando la propia cuenta seleccionada por defecto.
 async function setupUserPicker(myUid) {
   const snap = await getDocs(collection(db, "users"));
   const users = [];
@@ -109,6 +119,8 @@ async function setupUserPicker(myUid) {
   pickerEl.classList.remove("hidden");
 }
 
+// Actualiza el título de la vista: "Bitácora" (propia) o "Bitácora de X" si
+// un admin está viendo el historial de otro usuario.
 function updateTitle() {
   const selected = selectEl.selectedOptions[0];
   const label = selected ? selected.textContent.replace(/\s*\(tú\)$/, "") : "";
@@ -116,6 +128,8 @@ function updateTitle() {
     selected?.value === currentUser()?.uid ? "Bitácora" : `Bitácora de ${label}`;
 }
 
+// Dibuja la bitácora al abrir esa vista: con selector de usuario si es
+// admin, o directo la propia si es cliente.
 document.addEventListener("bitacora:show", async () => {
   const user = currentUser();
   if (!user) return;
@@ -131,6 +145,7 @@ document.addEventListener("bitacora:show", async () => {
   }
 });
 
+// Al elegir otro usuario en el selector, redibuja su bitácora.
 selectEl.addEventListener("change", () => {
   renderBitacora(selectEl.value);
   updateTitle();

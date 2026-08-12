@@ -8,6 +8,7 @@ const grid = document.getElementById("catalog-grid");
 const statusEl = document.getElementById("catalog-status");
 const searchInput = document.getElementById("catalog-search");
 
+// Devuelve el catálogo completo cargado en memoria (usado por admin.js).
 export function getAllProducts() {
   return allProducts;
 }
@@ -23,16 +24,19 @@ export function upsertLocalProduct(product) {
   renderProducts(currentFilter());
 }
 
+// Quita un producto del catálogo local (tras eliminarlo desde el panel admin).
 export function removeLocalProduct(id) {
   allProducts = allProducts.filter((p) => p.id !== id);
   renderProducts(currentFilter());
 }
 
+// Filtra el catálogo según el texto de búsqueda actual.
 function currentFilter() {
   const term = searchInput.value.trim().toLowerCase();
   return term ? allProducts.filter((p) => p.title.toLowerCase().includes(term)) : allProducts;
 }
 
+// Carga el catálogo completo desde FakeStoreAPI.
 async function loadProducts() {
   statusEl.textContent = "Cargando productos...";
   try {
@@ -46,6 +50,7 @@ async function loadProducts() {
   }
 }
 
+// Dibuja las tarjetas de producto (imagen, título, precio, botón) en la grilla.
 function renderProducts(products) {
   grid.innerHTML = "";
   if (products.length === 0) {
@@ -68,6 +73,7 @@ function renderProducts(products) {
   }
 }
 
+// Filtra el catálogo en vivo mientras el usuario escribe en el buscador.
 searchInput.addEventListener("input", () => {
   const term = searchInput.value.trim().toLowerCase();
   const filtered = term
@@ -76,4 +82,5 @@ searchInput.addEventListener("input", () => {
   renderProducts(filtered);
 });
 
+// Carga el catálogo apenas el usuario inicia sesión.
 document.addEventListener("auth:login", loadProducts);

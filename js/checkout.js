@@ -9,6 +9,7 @@ const errorEl = document.getElementById("checkout-error");
 const confirmationTitle = document.getElementById("confirmation-title");
 const confirmationDetails = document.getElementById("confirmation-details");
 
+// Dibuja el resumen del pedido (productos y total) en la pantalla de checkout.
 function renderSummary() {
   const items = getCartItems();
   const total = getCartTotal();
@@ -19,6 +20,7 @@ function renderSummary() {
     `<p><strong>Total a pagar: $${total.toFixed(2)}</strong></p>`;
 }
 
+// Muestra/oculta el mensaje de error del formulario de pago con tarjeta.
 function showCheckoutError(message) {
   errorEl.textContent = message;
   errorEl.classList.remove("hidden");
@@ -29,6 +31,8 @@ function clearCheckoutError() {
   errorEl.classList.add("hidden");
 }
 
+// Valida la tarjeta simulada y, según el resultado, aprueba o rechaza la
+// compra, registrando el pedido en la bitácora en ambos casos.
 form.addEventListener("submit", (e) => {
   e.preventDefault();
   clearCheckoutError();
@@ -79,14 +83,17 @@ form.addEventListener("submit", (e) => {
   showView("view-confirmation");
 });
 
+// Botón "Cancelar": descarta el formulario y vuelve al carrito.
 document.getElementById("checkout-cancel-btn").addEventListener("click", () => {
   clearCheckoutError();
   form.reset();
   showView("view-cart");
 });
 
+// Botón "Volver al catálogo" tras ver la confirmación de compra.
 document.getElementById("confirmation-continue-btn").addEventListener("click", () => {
   showView("view-catalog");
 });
 
+// Dibuja el resumen del pedido al entrar a la pantalla de checkout.
 document.addEventListener("checkout:show", renderSummary);

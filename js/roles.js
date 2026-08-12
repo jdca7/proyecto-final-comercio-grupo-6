@@ -13,10 +13,12 @@ import {
 
 let currentRole = "cliente";
 
+// Devuelve el rol del usuario actual guardado en memoria.
 export function getCurrentRole() {
   return currentRole;
 }
 
+// Indica si el usuario actual tiene rol de administrador.
 export function isAdmin() {
   return currentRole === "admin";
 }
@@ -24,6 +26,8 @@ export function isAdmin() {
 const adminBtn = document.getElementById("nav-admin-btn");
 const bitacoraBtn = document.getElementById("nav-bitacora-btn");
 
+// Lee el rol del usuario desde Firestore al iniciar sesión (o lo crea como
+// "cliente" si es la primera vez), y ajusta la interfaz según ese rol.
 async function loadRole(user) {
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
@@ -50,10 +54,12 @@ async function loadRole(user) {
   document.dispatchEvent(new CustomEvent("role:ready", { detail: { role: currentRole } }));
 }
 
+// Carga el rol del usuario cada vez que inicia sesión.
 document.addEventListener("auth:login", (e) => {
   loadRole(e.detail.user);
 });
 
+// Resetea el rol y la interfaz de administración al cerrar sesión.
 document.addEventListener("auth:logout", () => {
   currentRole = "cliente";
   adminBtn.classList.add("hidden");

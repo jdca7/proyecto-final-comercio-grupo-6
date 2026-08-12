@@ -21,6 +21,7 @@ const confirmationDetails = document.getElementById("confirmation-details");
 let sdkLoadPromise = null;
 let buttonsRendered = false;
 
+// Muestra/oculta el mensaje de error de la sección de pago con PayPal.
 function showPaypalError(message) {
   paypalErrorEl.textContent = message;
   paypalErrorEl.classList.remove("hidden");
@@ -30,6 +31,8 @@ function clearPaypalError() {
   paypalErrorEl.classList.add("hidden");
 }
 
+// Carga el script del SDK de PayPal una sola vez (cachea la promesa para no
+// insertar el <script> más de una vez si el usuario cambia de método de pago).
 function loadPaypalSdk() {
   if (sdkLoadPromise) return sdkLoadPromise;
   sdkLoadPromise = new Promise((resolve, reject) => {
@@ -43,6 +46,9 @@ function loadPaypalSdk() {
   return sdkLoadPromise;
 }
 
+// Dibuja el botón de PayPal y define qué pasa al crear la orden, al
+// aprobarla (captura el pago real de sandbox y confirma la compra), al
+// fallar, o al cancelarla.
 async function renderPaypalButtons() {
   if (buttonsRendered) return;
   if (!PAYPAL_CLIENT_ID || PAYPAL_CLIENT_ID === "TODO") {
@@ -97,6 +103,8 @@ async function renderPaypalButtons() {
   }
 }
 
+// Muestra el formulario de tarjeta simulada o el botón de PayPal según el
+// método de pago elegido con los radio buttons.
 function updatePaymentMethodView() {
   const usePaypal = methodPaypalRadio.checked;
   cardForm.classList.toggle("hidden", usePaypal);
@@ -107,11 +115,13 @@ function updatePaymentMethodView() {
 methodCardRadio.addEventListener("change", updatePaymentMethodView);
 methodPaypalRadio.addEventListener("change", updatePaymentMethodView);
 
+// Botón "Cancelar" de la sección de PayPal: vuelve al carrito.
 document.getElementById("paypal-cancel-btn").addEventListener("click", () => {
   clearPaypalError();
   showView("view-cart");
 });
 
+// Al entrar a checkout, deja seleccionado el método "tarjeta" por defecto.
 document.addEventListener("checkout:show", () => {
   methodCardRadio.checked = true;
   updatePaymentMethodView();

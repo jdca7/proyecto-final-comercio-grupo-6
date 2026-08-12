@@ -14,6 +14,8 @@ import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-aut
 import { showView } from "./app.js";
 import { generateSecret, verifyTotp, formatSecret } from "./lib/totp.js";
 
+// Clave de sessionStorage que recuerda si ya se verificó el 2FA en esta
+// pestaña/sesión del navegador, para no pedir el código en cada recarga.
 function sessionKey(uid) {
   return `2fa_verified_${uid}`;
 }
@@ -30,6 +32,7 @@ const verifyForm = document.getElementById("twofa-verify-form");
 const verifyCodeInput = document.getElementById("twofa-verify-code");
 const verifyErrorEl = document.getElementById("twofa-verify-error");
 
+// Muestra/oculta el mensaje de error en la pantalla de configuración inicial del 2FA.
 function showSetupError(msg) {
   setupErrorEl.textContent = msg;
   setupErrorEl.classList.remove("hidden");
@@ -38,6 +41,7 @@ function clearSetupError() {
   setupErrorEl.textContent = "";
   setupErrorEl.classList.add("hidden");
 }
+// Muestra/oculta el mensaje de error en la pantalla de verificación del 2FA.
 function showVerifyError(msg) {
   verifyErrorEl.textContent = msg;
   verifyErrorEl.classList.remove("hidden");
@@ -47,6 +51,9 @@ function clearVerifyError() {
   verifyErrorEl.classList.add("hidden");
 }
 
+// Decide qué pantalla mostrar tras el login: configurar el 2FA por primera
+// vez, pedir el código si aún no se verificó en esta sesión del navegador,
+// o dejar pasar directo al catálogo si ya se verificó.
 async function handleAuthLogin(user) {
   const userRef = doc(db, "users", user.uid);
   const snap = await getDoc(userRef);
@@ -79,6 +86,8 @@ async function handleAuthLogin(user) {
   showView("view-2fa-verify");
 }
 
+// Confirma la configuración inicial del 2FA: valida el primer código contra
+// la clave generada y, si es correcto, marca el 2FA como activado.
 setupForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearSetupError();
@@ -92,6 +101,7 @@ setupForm.addEventListener("submit", async (e) => {
   showView("view-catalog");
 });
 
+// Valida el código de 2FA en logins posteriores (cuando ya está configurado).
 verifyForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   clearVerifyError();
@@ -104,6 +114,8 @@ verifyForm.addEventListener("submit", async (e) => {
   showView("view-catalog");
 });
 
+// Permite cerrar sesión desde la pantalla de verificación si el usuario no
+// puede completar el 2FA (por ejemplo, perdió el dispositivo).
 document.getElementById("twofa-verify-logout-link").addEventListener("click", (e) => {
   e.preventDefault();
   signOut(auth);

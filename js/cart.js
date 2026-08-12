@@ -15,10 +15,12 @@ const totalEl = document.getElementById("cart-total");
 const checkoutBtn = document.getElementById("cart-checkout-btn");
 const cartCountEl = document.getElementById("nav-cart-count");
 
+// Referencia al documento de Firestore donde se guarda el carrito de un usuario.
 function cartDocRef(uid) {
   return doc(db, "carts", uid);
 }
 
+// Carga el carrito guardado del usuario al iniciar sesión.
 async function loadCart(uid) {
   currentUid = uid;
   const snap = await getDoc(cartDocRef(uid));
@@ -26,29 +28,35 @@ async function loadCart(uid) {
   updateCartBadge();
 }
 
+// Guarda el estado actual del carrito en Firestore.
 async function saveCart() {
   if (!currentUid) return;
   await setDoc(cartDocRef(currentUid), { items });
 }
 
+// Actualiza el contador de productos en la barra de navegación.
 function updateCartBadge() {
   cartCountEl.textContent = calculateCount(items);
 }
 
+// Expone los productos del carrito a otros módulos (checkout.js).
 export function getCartItems() {
   return items;
 }
 
+// Expone el total del carrito a otros módulos (checkout.js).
 export function getCartTotal() {
   return calculateTotal(items);
 }
 
+// Vacía el carrito (se usa al completar una compra).
 export async function clearCart() {
   items = [];
   await saveCart();
   updateCartBadge();
 }
 
+// Dibuja las filas del carrito (nombre, cantidad, precio, botones) en la vista.
 function renderCart() {
   itemsEl.innerHTML = "";
   if (items.length === 0) {
@@ -73,6 +81,7 @@ function renderCart() {
   checkoutBtn.disabled = items.length === 0;
 }
 
+// Maneja los clics en los botones +/-/Quitar de cada fila del carrito.
 itemsEl.addEventListener("click", async (e) => {
   const id = Number(e.target.dataset.id);
   if (!id) return;
@@ -104,15 +113,18 @@ itemsEl.addEventListener("click", async (e) => {
   }
 });
 
+// Botón "Seguir comprando": vuelve al catálogo.
 document.getElementById("cart-back-btn").addEventListener("click", () => {
   showView("view-catalog");
 });
 
+// Botón "Proceder al pago": avanza a la pantalla de checkout.
 checkoutBtn.addEventListener("click", () => {
   showView("view-checkout");
   document.dispatchEvent(new CustomEvent("checkout:show"));
 });
 
+// Agrega un producto al carrito (o incrementa su cantidad si ya estaba).
 document.addEventListener("cart:add", async (e) => {
   items = addOrIncrement(items, e.detail.product);
   await saveCart();
@@ -122,12 +134,15 @@ document.addEventListener("cart:add", async (e) => {
   );
 });
 
+// Dibuja el carrito al abrir esa vista.
 document.addEventListener("cart:show", renderCart);
 
+// Carga el carrito del usuario al iniciar sesión.
 document.addEventListener("auth:login", (e) => {
   loadCart(e.detail.user.uid);
 });
 
+// Limpia el carrito en memoria al cerrar sesión (no lo borra de Firestore).
 document.addEventListener("auth:logout", () => {
   items = [];
   currentUid = null;
